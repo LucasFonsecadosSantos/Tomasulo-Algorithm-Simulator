@@ -1,0 +1,694 @@
+///////////////////////////////////////////////////////////////////////////////////
+///                                                                             ///
+///                                                                             ///
+///                                                                             ///
+///                                                                             ///
+///   Project by:                                                               ///
+///    _      _____ ______    _____ ____  __  __ _____        _   ___     __    ///
+///   | |    / ____|  ____|  / ____/ __ \|  \/  |  __ \ /\   | \ | \ \   / /    ///
+///   | |   | |    | |__    | |   | |  | | \  / | |__) /  \  |  \| |\ \_/ /     ///
+///   | |   | |    |  __|   | |   | |  | | |\/| |  ___/ /\ \ | . ` | \   /      ///
+///   | |___| |____| |      | |___| |__| | |  | | |  / ____ \| |\  |  | |       ///
+///   |______\_____|_|       \_____\____/|_|  |_|_| /_/    \_\_| \_|  |_|       ///
+///   Assessoria em tecnologia e marketing.                                     ///
+///                                                                             ///
+///                                                                             ///
+///                                                                             ///
+///                                                                             ///
+///////////////////////////////////////////////////////////////////////////////////
+///                                                                             ///
+/// [PROJECT]: Name: Congresso da Pós Graduação.                                ///
+///            URL:  www.----.ufla.br                                           ///
+///            GIT:  <Link não disponivel. GIT server privado>                  ///
+/// +-------------------------------------------------------------------------+ ///
+///                                                                             ///
+/// [DEVELOPMENT]:  Code Developer:   Lucas Fonseca dos Santos.                 ///
+///                 System Developer: Lucas Fonseca dos Santos.                 ///
+///                 Design Creater:   Lucas Fonseca dos Santos.                 ///
+///                 Tester:           Lucas Fonseca dos Santos.                 ///
+/// +-------------------------------------------------------------------------+ ///
+///                                                                             ///
+/// [INFORMATIONS]: Fonts:  Ubuntu, 300, 400, 500, 700                          ///
+///                         Open Sans, 300, 400, 600, 700                       ///
+///                         Open Sans Condensed, 300, 700                       ///
+///                 Colors: #000000                                             ///
+///                         #000000                                             ///
+///                         #000000                                             ///
+///                         #000000                                             ///
+/// +-------------------------------------------------------------------------+ ///
+///                                                                             ///
+///   Use .content to write class .container by bootstrap and .line to write    ///
+///   .row class by bootstrap.                                                  ///
+///                                                                             ///
+///   Use mixin extend_grid() with the params: LG value, MD value, SM value,    ///
+///   XS value in respective order to extend grid system of bootstrap.          ///
+///                                                                             ///
+///////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////
+///                              FILE INFORMATION                               ///
+///-----------------------------------------------------------------------------///
+/// [NAME]: Core                                                                ///
+/// [CONTENT]: Responsible for all front end struct.                            ///
+///////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+*
+   font-size: 100%
+   margin:    0px auto
+   padding:   0px
+
+
+
+
+
+body
+   overflow-x: hidden
+   
+main
+   background: #afc3fd
+
+
+
+
+//----------------------------------[ IMPORTS ]----------------------------------//
+@import "libs/_bootstrap.scss"
+@import "variables.sass"
+@import "https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700|Open+Sans:300,400,600,700|Ubuntu:300,400,500,700"
+@import "https://fonts.googleapis.com/css?family=Archivo+Black"
+//-------------------------------------------------------------------------------//
+
+
+
+
+
+//----------------------------------[ MIXINS ]-----------------------------------//
+@mixin transform_translateX($param)
+   transform:           translateX($param)
+   -o-transform:        translateX($param)
+   -ms-transform:       translateX($param)
+   -moz-transform:      translateX($param)
+   -webkit-transform:   translateX($param)
+
+@mixin transform_translateY($param)
+   transform:           translateY($param)
+   -o-transform:        translateY($param)
+   -ms-transform:       translateY($param)
+   -moz-transform:      translateY($param)
+   -webkit-transform:   translateY($param)
+
+@mixin border_radius($param)
+   border-radius:         $param
+   -o-border-radius:      $param
+   -ms-border-radius:     $param
+   -moz-border-radius:    $param
+   -webkit-border-radius: $param
+
+@mixin transform_rotate($param)
+    transform: rotate($param)
+    -o-transform: rotate($param)
+    -ms-transform: rotate($param)
+    -moz-transform: rotate($param)
+    -webkit--transform: rotate($param)
+
+@mixin gradient_background($param1, $param2, $param3)
+   background: $param2
+   linear-gradient($param1, $param2 , $param3)
+   -o-linear-gradient($param1, $param2 , $param3)
+   -ms-linear-gradient($param1, $param2 , $param3)
+   -moz-linear-gradient($param1, $param2 , $param3)
+   -webkit-linear-gradient($param1, $param2 , $param3) 
+
+@mixin gradient_line($param1, $param2, $param3, $param4)
+   background: $param2
+   linear-gradient($param1, $param2 , $param3)
+   -o-linear-gradient($param1, $param2 , $param3)
+   -ms-linear-gradient($param1, $param2 , $param3)
+   -moz-linear-gradient($param1, $param2 , $param3)
+   -webkit-linear-gradient($param1, $param2 , $param3)
+
+@mixin horizontal_div_divider_1($param1, $param2)
+   border-bottom: 100vh $param1 solid
+   border-top:    0vh solid transparent 
+   border-right:  $param2 20vw solid
+   border-left:   0px $param2 solid
+
+@mixin horizontal_div_divider_2($param1, $param2)
+   border-bottom: 0vh solid transparent
+   border-top:    100vh $param1 solid
+   border-right:  0px $param2 solid
+   border-left:   $param2 20vw solid
+
+@mixin divider($param1, $param2)
+    @extend .hidden-xs
+    min-height:     200px
+    height:         200px
+    overflow:       hidden
+    margin:         0px
+    border-top:     200px solid #afc3fd
+    border-left:    50vw solid $__COLOR__dark-gray_ !important
+    border-right:   50vw solid $__COLOR__dark-gray_ !important
+    border-bottom:  none
+    z-index:        10 !important
+
+@mixin filter($param)
+   filter:         $param
+   -o-filter:      $param
+   -ms-filter:     $param
+   -moz-filter:    $param
+   -webkit-filter: $param
+
+@mixin responsive_system($param1, $param2, $param3, $param4)
+   @extend .col-lg-#{$param1}
+   @extend .col-md-#{$param2}
+   @extend .col-sm-#{$param3}
+   @extend .col-xs-#{$param4}
+//-------------------------------------------------------------------------------//
+
+
+
+
+
+//----------------------------------[ FONTS ]------------------------------------//
+h1
+    position: relative
+    font:
+        family: $__FONT__title_
+        weight: 100
+        size: 5em
+    text:
+        transform: uppercase
+    color: #FFF//$__COLOR__white_
+    margin: 0px
+h2
+    position: relative
+    font:
+        family: $__FONT__text1_
+        weight: 800
+        size: 1.8em
+    text:
+        transform: uppercase
+    margin: 0px
+h3
+    position: relative
+    font:
+        family: $__FONT__text1_
+        weight: 800
+        size: 1.3em
+    text-transform: uppercase
+    color: $__COLOR__white_
+    margin: 0px
+h4
+h5
+label
+a
+    font:
+        family: inherit
+        size:   inherit
+        weight: inherit
+    color:  inherit
+    cursor: pointer
+    text:
+        decoration: underline
+        transform: inherit
+    outline: none
+p
+    margin: 0px
+    font:
+        family: $__FONT__text1_
+        weight: 100
+        size: 1.2em
+    text-align: left
+//-------------------------------------------------------------------------------//
+
+
+
+
+
+//----------------------------------[ SUPERCLASS ]-------------------------------//
+.transitions
+   transition:          $__ANIMATION__TIME__
+   -o-transition:       $__ANIMATION__TIME__
+   -ms-transition:      $__ANIMATION__TIME__
+   -moz-transition:     $__ANIMATION__TIME__
+   -webkit-transition:  $__ANIMATION__TIME__
+
+.content
+    @extend .container
+
+.line 
+    @extend .row
+
+.titleSection
+    //@extend .line
+    @extend .text-center
+    margin-bottom: 35px
+    h2
+       position: relative
+       padding-bottom: 2px
+       text-decoration: none
+       text-transform: uppercase
+       padding: 0px 0px 10px 0px
+       color: $__COLOR__light-gray_
+       &::first-letter
+          text-transform: uppercase
+       &::after
+          content: ""
+          position: absolute
+          bottom: 0px
+          left: 0
+          height: 1px
+          width: 100%
+          background: #444
+          background: linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
+          background: -moz-linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
+          background: -o-linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
+          background: -webkit-linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
+          background: -ms-linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
+
+.menuSecond
+    background: #F00 !important
+
+.divider01
+    @extend .hidden-xs
+    min-height: 200px
+    height: 200px
+    overflow: hidden
+    margin: 0px
+    @include transform_translateY(-100%)
+    border-top: 200px solid transparent
+    border-left: 50vw solid #afc3fd !important
+    border-right: 50vw solid #afc3fd !important
+    border-bottom: none
+
+.divider02
+    @include divider(#afc3fd, $__COLOR__dark-gray_)
+
+.white-title
+    color: $__COLOR__white_ !important
+    &::after
+        background: #FFF !important
+        background: linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
+        background: -moz-linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
+        background: -o-linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
+        background: -webkit-linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
+        background: -ms-linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
+//-------------------------------------------------------------------------------//
+
+
+
+
+
+
+//-----------------------------------[ FORMS ]-----------------------------------//
+input, textarea
+button
+table
+    @include responsive_system(12,12,12,12)
+    @extend .hidden-sm
+    @extend .hidden-xs
+    margin: 100px 0px 100px 0px
+    thead
+        tr
+            @extend .text-center
+            @include gradient_background(left,#2948ff,#396afc)
+            width: 100%
+            height: 50px
+            td
+                padding: 1% !important
+    tbody
+        tr
+            @extend .text-center
+            width:  100%
+            height: 80px
+            border:
+                top:   none
+                left:  none
+                right: none
+                bottom: solid 1px rgba(255,255,255,0.1)
+            &:last-child
+                border-bottom: none
+            &::after
+                content: ""
+                position: absolute
+                bottom: -15px
+                left: 0
+                height: 1px
+                width: 100%
+                background: #2948ff
+                background: linear-gradient(left, transparent 0%,#2948ff 50%,transparent 100%)
+                background: -moz-linear-gradient(left, transparent 0%,#2948ff 50%,transparent 100%)
+                background: -o-linear-gradient(left, transparent 0%,#2948ff 50%,transparent 100%)
+                background: -webkit-linear-gradient(left, transparent 0%,#2948ff 50%,transparent 100%)
+                background: -ms-linear-gradient(left, transparent 0%,#2948ff 50%,transparent 100%)
+            td
+                padding: 1% !important
+                p
+                    @extend .white-title
+                    @extend .text-center
+                    &:first-letter
+                        text-transform: uppercase
+                &:first-child
+                    p
+                        font-weight: bold
+//-------------------------------------------------------------------------------//
+
+
+
+
+
+
+//----------------------------------[ SECTIONS ]---------------------------------//
+
+//+++++++++++++++++++++Header++++++++++++++++++++++//
+header
+    @extend .text-center
+    min-height: $__HEIGHT__header_
+    height: auto
+    // background-image: url('http://www.ufla.br/ascom/wp-content/uploads/2011/08/Reitoria_arerea_montagem1.jpg'), linear-gradient(to right, #2948ff, #396afc)
+    // background-size: cover
+    background: #396afc
+    background: -webkit-linear-gradient(to right, #2948ff, #396afc), url('http://www.ufla.br/ascom/wp-content/uploads/2011/08/Reitoria_arerea_montagem1.jpg')
+    background: linear-gradient(to right, #2948ff, #396afc), url('http://www.ufla.br/ascom/wp-content/uploads/2011/08/Reitoria_arerea_montagem1.jpg')
+    .menu
+        @include border_radius(0px)
+        background: none
+        content: ""
+        border: none
+        .navbar-nav
+            li 
+                a
+                    font:
+                        family: $__FONT__text1_ !important
+                        weight: 500 !important
+                    color: $__COLOR__white_
+                    text:
+                        transform: lowercase
+        .navbar-brand
+            color: $__COLOR__white_ !important
+            text: 
+                transform: uppercase !important
+            font:
+                family: $__FONT__title_ !important
+                weight: 400 !important
+        .subMenu
+            &::after
+                position: absolute
+                bottom: 0px
+                left: 15%
+                height: 1px
+                width: 70%
+                background: #444
+                background: linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
+                background: -moz-linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
+                background: -o-linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
+                background: -webkit-linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
+                background: -ms-linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
+    .headerContent
+        @include transform_translateY(90%)
+        position: relative
+        display: block
+        .headerButton
+            @include transform_rotate(90deg)
+            cursor: pointer
+            with: 50px
+            height: 50px
+            position: relative
+            
+        .subHeaderContent
+            @include responsive_system(6,6,6,6)
+            h1
+                &[class="s1"]
+                    text-align: left !important
+                &[class="s0"]
+                    @include transform_translateY(-14.5%)
+                    text-align: right !important
+                    font-size: 20em //!important
+                &
+
+//++++++++++++++++++End of header++++++++++++++++++//
+
+//+++++++++++++++++++++Footer++++++++++++++++++++++//
+footer
+    min-height: $__HEIGHT__footer_
+    height: auto
+    background: $__COLOR__dark-gray_
+
+#copyright
+    background: $__COLOR__light-gray_ !important
+    @extend .text-center
+    padding: 0.7%
+    p
+        text-align: center !important
+        cursor: pointer
+//++++++++++++++++++End of Footer++++++++++++++++++//
+
+//+++++++++++++++++++++Index01+++++++++++++++++++++//
+#index01 //#afc3fd
+    min-height: auto
+    height: auto
+    background: #afc3fd
+    margin-top: -5%
+    .subIndex01
+        @include responsive_system(4,4,12,12)
+        &:first-child
+            @extend .text-left
+            img
+                &:nth-child(2n-1)
+                    @include transform_rotate(-25deg)
+        &:last-child
+            @extend .text-right
+            img
+                @include transform_rotate(25deg)
+        &:first-child, &:last-child
+            @extend .hidden-sm
+            @extend .hidden-xs
+        p
+            text-align: center !important
+        .fix
+            @include transform_translateY(80%)
+            margin-top: -80%
+            display: none
+            img
+                @extend .text-center
+                @extend .img-responsive
+                width: 350px
+                height: 450px
+                z-index: -10 !important
+        img
+            @extend .text-center
+            width: 50%
+            margin-bottom: 20%
+            -moz-filter: opacity(0.4) !important
+//+++++++++++++++++++++End of Index01++++++++++++++//
+
+//+++++++++++++++++++++Index02+++++++++++++++++++++//
+#index02
+    min-height: 100vh
+    height: auto
+    background: $__COLOR__dark-gray_
+    padding: $__PADDING-DEFAULT__
+
+//+++++++++++++++++++++End of Index02++++++++++++++//
+
+//+++++++++++++++++++++Index03+++++++++++++++++++++//
+#index03
+    padding: $__PADDING-DEFAULT__
+    min-height: $__HEIGHT__index03_
+    height: auto
+    background: #afc3fd //#ECE9E6
+    // background: -webkit-linear-gradient(to right, #FFFFFF, #ECE9E6)
+    // background: linear-gradient(to right, #FFFFFF, #ECE9E6)
+    .subIndex03
+        @include responsive_system(6,6,12,12)
+        &:first-child
+            p
+                &:first-letter
+                    text-transform: uppercase !important
+        &:last-child
+            @extend .text-center
+//+++++++++++++++++++++End of Index03++++++++++++++//
+
+//+++++++++++++++++++++Index04+++++++++++++++++++++//
+#index04
+    height: auto
+    min-height: $__HEIGHT__index04_
+    padding: $__PADDING-DEFAULT__
+    background: $__COLOR__dark-gray_
+    .subIndex04
+        @include responsive_system(4,4,6,12)
+        padding: 5%
+        .cell
+            width: 100%
+            min-height: 300px
+            height: auto
+            background: #396afc
+            background: linear-gradient(to right, #2948ff, #396afc)
+            background: -ms-linear-gradient(to right, #2948ff, #396afc)
+            background: -moz-linear-gradient(to right, #2948ff, #396afc)
+            background: -webkit--linear-gradient(to right, #2948ff, #396afc)
+//+++++++++++++++++++++End of Index04++++++++++++++//
+
+//+++++++++++++++++++++Index05+++++++++++++++++++++//
+#index05
+    padding: $__PADDING-DEFAULT__
+    min-height: $__HEIGHT__index05_
+    height: auto
+    background: #afc3fd //#ECE9E6
+    // background: -webkit-linear-gradient(to right, #FFFFFF, #ECE9E6)
+    // background: linear-gradient(to right, #FFFFFF, #ECE9E6)
+    .subIndex05
+        @include responsive_system(6,6,12,12)
+        &:last-child
+            p
+                &:first-letter
+                    text-transform: uppercase !important
+        &:first-child
+            @extend .text-center
+            img
+                @extend .img-responsive
+                width: 70%
+//+++++++++++++++++++++End of Index05++++++++++++++//
+
+//-------------------------------------------------------------------------------//
+
+
+
+
+//----------------------------------[ RESPONSIVE COND. ]-------------------------//
+@media screen and (min-width: 1921px)
+    h1
+        font-size: 2em !important
+    h2
+        font-size: 1.8em !important
+
+@media screen and (max-width: 1750px) and (min-width: 1550px)
+    h1
+        font-size: 5em !important
+    h2
+        font-size: 1.8em !important
+    header
+        h1
+            &[class="s0"]
+                font-size: 20em !important
+    #index03
+        iframe
+            text-align: center !important
+        .subIndex03
+            p
+                text-align: left !important
+
+@media screen and (max-width: 1549px) and (min-width: 1350px)
+    h1
+        font-size: 5em !important
+    h2
+        font-size: 1.8em !important
+    header
+        h1
+            &[class="s0"]
+                font-size: 20em !important
+    #index03
+        iframe
+            text-align: center !important
+        .subIndex03
+            p
+                text-align: left !important
+
+@media screen and (max-width: 1349px) and (min-width: 1200px)
+    h1
+        font-size: 5em !important
+    h2
+        font-size: 1.8em !important
+    header
+        h1
+            &[class="s0"]
+                font-size: 20em !important
+    #index03
+        iframe
+            text-align: center !important
+        .subIndex03
+            p
+                text-align: left !important
+
+
+@media screen and (max-width: 1199px) and (min-width: 992px)
+    h1
+        font-size: 3.5em !important
+    h2
+        font-size: 1.8em !important
+    header
+        h1
+            &[class="s0"]
+                font-size: 14em !important
+    #index03
+        iframe
+            text-align: center !important
+        .subIndex03
+            p
+                text-align: left !important
+
+@media screen and (max-width: 991px) and (min-width: 768px)
+    h1
+        font-size: 3.5em !important
+    h2
+        font-size: 1.8em !important
+    header
+        h1
+            &[class="s0"]
+                font-size: 14em !important
+    #index03
+        .subIndex03
+            p
+                text-align: center !important
+            padding: 3% 7% 3% 7%
+
+@media screen and (max-width: 767px) and (min-width: 550px)
+    h1
+        font-size: 3em !important
+    h2
+        font-size: 1.8em !important
+    header
+        h1
+            &[class="s0"]
+                font-size: 12em !important
+    #index03
+        p
+            text-align: center !important
+        .subIndex03
+            padding: 3% 7% 3% 7%
+
+@media screen and (max-width: 549px) and (min-width: 350px)
+    h1
+        font-size: 2em !important
+    h2
+        font-size: 1.8em !important
+    header
+        h1
+            &[class="s0"]
+                font-size: 8em !important
+    #index03
+        .subIndex03
+            p
+                text-align: center !important
+            padding: 3% 7% 3% 7%
+
+@media screen and (max-width: 349px)
+    h1
+        font-size: 1em !important
+    h2
+        font-size: 1.2em !important
+    p
+        font-size: 1em !important
+    header
+        h1
+            &[class="s0"]
+                font-size: 4em !important
+    #index03
+        .subIndex03
+            p
+                text-align: center !important
+            padding: 3% 7% 3% 7%
+//-------------------------------------------------------------------------------//
