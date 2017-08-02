@@ -72,26 +72,45 @@ html
     //---------------------------[IMPORTS]---------------------------//
     link(rel="stylesheet", href="ext/css/core.css")
     //---------------------------------------------------------------//
-  body
+  body(onload="start()")
     header
         div.line
             div.titleSection
                 h2.white-title 
-                    |Tomasulo Algorithm Simulador
+                    |Tomasulo Algorithm Simulator
                     p developed by: Lucas Santos, Marco Aurelio, Igor Nunes and Alan Luz.
     main
         div.line
             form()
                 div.line
                     div.subForm
-                        input(type="text", placeholder="teste")
+                        label instruction
+                        select(type="text", placeholder="teste",onclick="teste()", id="instruction_name")
+                            option(value="ADDD") ADDD
+                            option(value="SUBD") SUBD
+                            option(value="MULTD") MULTD
+                            option(value="DIVD") DIVD
+                            option(value="LD") LD
+                            option(value="SD") SD
+                            option(value="ADD") ADD
+                            option(value="DADDUI") DADDUI
+                            option(value="BEQ") BEQ
+                            option(value="BNEZ") BNEZ
+                
                     div.subForm
-                        input(type="text", placeholder="teste")
+                        label Destination Register
+                        select(type="text", placeholder="teste", id="registers_list")
+                    div.subForm
+                        label RS Register / Offeset
+                        select(type="text", placeholder="teste", id="registers_list02")
+                    div.subForm
+                        label RT Register / Label
+                        select(type="text", placeholder="teste", id="registers_list03")
                 div.line
-                    select
-                div.line
-                    button(type="submit") start
-                    button() clear the form
+                    button(onclick="test()") start
+                    button(id="confirmButton") confirm instruction
+                    button(onclick="clear_form()") clear the form
+                    button(onclick="window.open('help.html', '_blank')") help-me
                 
     footer
         div.line
