@@ -213,6 +213,7 @@ p
 
 
 
+
 //----------------------------------[ SUPERCLASS ]-------------------------------//
 .transitions
    transition:          $__ANIMATION__TIME__
@@ -252,22 +253,15 @@ p
             left: 0
             height: 1px
             width: 100%
-            background: #444
-            background: linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
-            background: -moz-linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
-            background: -o-linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
-            background: -webkit-linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
-            background: -ms-linear-gradient(left, transparent 0%,#444 50%,transparent 100%)
+            background: #FFF !important
+            background: linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
+            background: -moz-linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
+            background: -o-linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
+            background: -webkit-linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
+            background: -ms-linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
 
 .white-title
     color: $__COLOR__white_ !important
-    &::after
-        background: #FFF !important
-        background: linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
-        background: -moz-linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
-        background: -o-linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
-        background: -webkit-linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
-        background: -ms-linear-gradient(left, transparent 0%,#FFF 50%,transparent 100%) !important
 //-------------------------------------------------------------------------------//
 
 
@@ -276,8 +270,45 @@ p
 
 
 //-----------------------------------[ FORMS ]-----------------------------------//
-input, textarea
+input, textarea, select
+    @extend .transitions
+    @include border_radius(8px)
+    background: none
+    outline: none
+    border: solid 2px #FFF
+    padding: 15px
+    color: #FFF
+    cursor: pointer
+    font:
+        family: $__FONT__text1_
+        size: 1.5em
+    &:hover
+        background: $__COLOR__white_
+        color: #333399
+    &:focus
+        background: $__COLOR__white_
+        color: #333399
 button
+    background: #FFF
+    border: none
+    padding: 15px
+    margin-top: 15px
+    font:
+        color: #333399
+        weight: 200
+        font-family: $__FONT__text1_
+        size: 1.5em
+    &:hover
+        background: #f3f3f3
+        
+    &:first-child
+        border-top-left-radius: 8px
+        border-bottom-left-radius: 8px
+        margin-right: 2.5px
+    &:last-child
+        border-top-right-radius: 8px
+        border-bottom-right-radius: 8px
+        margin-left: 2.5px
 table
     
 //-------------------------------------------------------------------------------//
@@ -299,6 +330,9 @@ header
 //+++++++++++++++++++++Footer++++++++++++++++++++++//
 footer
     @extend .line
+    .line
+        &:first-child
+            padding: 50px 0px 0px 100px
     #copyright
         width: 102vw
         position: absolute
@@ -309,14 +343,21 @@ footer
         p
             text-align: center !important
             cursor: pointer
+            span
+                @include transform_rotate(180deg)
+                transform: rotate(180deg) !important
+                display:inline-block
+                
 //++++++++++++++++++End of Footer++++++++++++++++++//
 
 //+++++++++++++++++++++Index01+++++++++++++++++++++//
-#index01 //#afc3fd
-    min-height: auto
-    height: auto
-    background: #afc3fd
-    margin-top: -5%
+main
+    @extend .text-center
+    padding: 50px 0px 0px 0px
+    form
+        @extend .container
+    .subForm
+        @include responsive_system(6,6,6,6)
 //++++++++++++++++++End of Index01+++++++++++++++++//
 
 //-------------------------------------------------------------------------------//

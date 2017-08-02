@@ -81,9 +81,33 @@ html
                     p developed by: Lucas Santos, Marco Aurelio, Igor Nunes and Alan Luz.
     main
         div.line
+            form()
+                div.line
+                    div.subForm
+                        input(type="text", placeholder="teste")
+                    div.subForm
+                        input(type="text", placeholder="teste")
+                div.line
+                    select
+                div.line
+                    button(type="submit") start
+                    button() clear the form
+                
     footer
+        div.line
+            div.titleSection
+                h2.white-title
+                    |
+                    p
         #copyright
-            p Desenvolvido por Lucas Fonseca dos Santos.
+            p
+                | All rights 
+                strong
+                    | not
+                |  reserved. GPL-3 
+                span 
+                    | &copy
+                |  2017. General Public License.
   script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js")
   script(src="http://code.jquery.com/ui/1.9.2/jquery-ui.js")
   //- script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js")
