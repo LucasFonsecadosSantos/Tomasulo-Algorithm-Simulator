@@ -107,6 +107,9 @@ html
                         label RT Register / Label
                         select(type="text", placeholder="teste", id="registers_list03")
                 div.line
+                    label instructions added
+                    textarea(id="instructions_list_viwer") 
+                div.line.fix
                     button(onclick="test()") start
                     button(id="confirmButton" type="button" onclick='confirmInst()') confirm instruction
                     button(onclick="clear_form()") clear the form

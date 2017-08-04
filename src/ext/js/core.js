@@ -93,19 +93,6 @@ const confirmInst = function () {
 };
 
 /**
- * This function is responsible for BLA BLA BLA
- */
-function confirmInstruction() {
-    var name = document.getElementById("instruction_name");
-    var r1 = document.getElementById("registers_list");
-    var r2 = document.getElementById("registers_list02");
-    var r3 = document.getElementById("registers_list03");
-
-    document.getElementById("instructions_list").innerHTML = "asd";
-    alert(document.getElementById("instructions_list").value);
-}
-
-/**
  * 
  */
 function clear_form() {
