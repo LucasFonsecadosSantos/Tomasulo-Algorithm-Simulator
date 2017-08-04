@@ -4,7 +4,7 @@ var counter = 0;
 function getFloatRegisters() {
     var str = "";
     for (i = 0; i <= 16; i = i + 2) {
-        str += "<option value='R" + i + "'> F" + i + " </option>"
+        str += "<option value='F" + i + "'> F" + i + " </option>"
     }
     return str;
 }
@@ -86,6 +86,7 @@ const confirmInst = function () {
 
     // alert('Type_R:', JSON.stringify(Type_R));
     data.push(Type_R);
+    document.getElementById("instructions_list_viwer").value += "-> "+Type_R.identifier + " " + Type_R.RD + " " + Type_R.RS + " " + Type_R.RT + "\n";
     data.forEach(function(element) {
         alert(JSON.stringify(element));
         // console.log(JSON.stringify(element));
