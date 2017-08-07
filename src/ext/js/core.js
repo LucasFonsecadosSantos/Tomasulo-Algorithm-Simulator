@@ -214,7 +214,7 @@ function exec() {
                     if(element.dyspatch_cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ < Instruction.dyspatch_cycle) {
                         cycle_exec[counter][0] = instruction.dyspatch_cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;
                     }else {
-                        cycle_exec[counter][0] = 
+                        cycle_exec[counter][0] = instruction.dyspatch_cycle; //paramos aqui calculando a quantidade de ciclos
                     }
                 }
             });
