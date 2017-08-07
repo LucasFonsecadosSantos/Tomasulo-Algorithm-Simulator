@@ -85,7 +85,7 @@ html
                 div.line
                     div.subForm
                         label instruction
-                        select(type="text", placeholder="teste",onclick="teste()", id="instruction_name")
+                        select(type="text", placeholder="teste",onclick="loadRegisters()", id="instruction_name")
                             option(value="ADDD") ADDD
                             option(value="SUBD") SUBD
                             option(value="MULTD") MULTD
@@ -96,6 +96,7 @@ html
                             option(value="DADDUI") DADDUI
                             option(value="BEQ") BEQ
                             option(value="BNEZ") BNEZ
+                        input#instruction_type(type="hidden")
                 
                     div.subForm
                         label Destination Register
@@ -110,8 +111,8 @@ html
                     label instructions added
                     textarea(id="instructions_list_viwer") 
                 div.line.fix
-                    button(onclick="test()") start
-                    button(id="confirmButton" type="button" onclick='confirmInst()') confirm instruction
+                    button(onclick="exec()") start
+                    button(id="confirmButton" type="button" onclick=="confirmInst()") confirm instruction
                     button(onclick="clear_form()") clear the form
                     button(onclick="window.open('help.html', '_blank')") help-me
                 
