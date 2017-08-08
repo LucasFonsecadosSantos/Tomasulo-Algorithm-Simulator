@@ -232,7 +232,7 @@ function exec() {
             Reservation_Stations.float_instructions_buffer.forEach(function(newElement) {
                 newElement = Instruction_Reservated;
             });
-            Reservation_Stations.float_instructions_buffer.forEach(function(newElement) {
+            Reservation_Stations.float_instructions_buffer_2.forEach(function(newElement) {
                 newElement = Instruction_Reservated;
             });
             Reservation_Stations_Memory.store_instructions_buffer.forEach(function(newElement) {
@@ -252,12 +252,17 @@ function exec() {
             }
         }
         if(currentInstructionToDyspatch.instruction_type == "integer") {
-            for(RSelement = 0; RSelement < Reservation_Stations.integer_instructions_buffer.length; RSelement++) {
-                if(!Reservation_Stations.integer_instructions_buffer[RSelement].disponibleBit) {
+            Reservation_Stations.integer_instructions_buffer.forEach(function(x) {
+                if(!x.disponibleBit) {
                     booleanControl = false;
                 }
-            }
-            if(!booleanControl) {
+            });
+            // for(RSelement = 0; RSelement < Reservation_Stations.integer_instructions_buffer.length; RSelement++) {
+            //     if(!Reservation_Stations.integer_instructions_buffer[RSelement].disponibleBit) {
+            //         booleanControl = false;
+            //     }
+            // }
+            if(booleanControl) {
                 instruction_status[dyspatch_instructions_amount][0] = cycle;
                 if(dependency_instruction.length == 0) {
                     instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;
@@ -288,20 +293,26 @@ function exec() {
             }else {
                 continue;
             }
-            if(!x.disponibleBit) {
-                x.dyspatch_cycle = currentInstructionToDyspatch.dyspatch_cycle; //Functional unit receives a current dyspatch cycle;
-                x.disponibleBit = true; //Busy
-                x.OPcodeLabel = currentInstructionToDyspatch.identifier; //Instruction name
-                //SETAR AS FILAS, TEM Q VER SE TEM DEPENDENCIA, FALTA
-                //VJ, VK, QJ, QK
-            }
+            // if(!x.disponibleBit) {
+            //     x.dyspatch_cycle = currentInstructionToDyspatch.dyspatch_cycle; //Functional unit receives a current dyspatch cycle;
+            //     x.disponibleBit = true; //Busy
+            //     x.OPcodeLabel = currentInstructionToDyspatch.identifier; //Instruction name
+            //     //SETAR AS FILAS, TEM Q VER SE TEM DEPENDENCIA, FALTA
+            //     //VJ, VK, QJ, QK
+            // }
             dyspatch_instructions_amount++;
         }else if(currentInstructionToDyspatch.instruction_type == "float_1") {
+            booleanControl = true;
             Reservation_Stations.float_instructions_buffer.forEach(function(x) {
                 if(!x.disponibleBit) {
                     booleanControl = false;
                 }
             });
+            // for(RSelement = 0; RSelement < Reservation_Stations.float_instructions_buffer.length; RSelement++) {
+            //     if(!Reservation_Stations.integer_instructions_buffer[RSelement].disponibleBit) {
+            //         booleanControl = false;
+            //     }
+            // }
             if(booleanControl) {
                 instruction_status[dyspatch_instructions_amount][0] = cycle;
                 if(dependency_instruction.length == 0) {
@@ -338,9 +349,11 @@ function exec() {
                         }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
                             if(dependency_instruction[k].dyspatch_cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
                                 instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
+                                //alert(" ciclo: "+cycle + "mem: "+__MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__+" flost "+__FLOAT_INSTRUCTION_CYCLES_AMOUNT__+ "DESPACHO "+dependency_instruction[k].dyspatch_cycle);
                                 alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
                                 instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__  + dependency_instruction[k].dyspatch_cycle;
+                                //alert(" ciclo: "+cycle + "mem: "+__MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__+" flost "+__FLOAT_INSTRUCTION_CYCLES_AMOUNT__+ "DESPACHO "+dependency_instruction[k].dyspatch_cycle);
                                 alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }
@@ -361,7 +374,8 @@ function exec() {
                 // }
                 dyspatch_instructions_amount++;
         }else if(currentInstructionToDyspatch.instruction_type == "float_2") {
-            Reservation_Stations.float_instructions_buffer.forEach(function(x) {
+            booleanControl = true;
+            Reservation_Stations.float_instructions_buffer_2.forEach(function(x) {
                 if(!x.disponibleBit) {
                     booleanControl = false;
                 }
@@ -369,43 +383,77 @@ function exec() {
             if(booleanControl) {
                 instruction_status[dyspatch_instructions_amount][0] = cycle;
                 if(dependency_instruction.length == 0) {
-                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
+                    if(currentInstructionToDyspatch.identifier == "MULTD") {
+                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;
+                    }else {
+                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;
+                    }
                 }else {
                     for(k = dependency_instruction.length-1 ; k >= 0 ; k--) {
                         
                         if(dependency_instruction[k].instruction_type == "float_1") {
-                            if(dependency_instruction[k].dyspatch_cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
-                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
-                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }
-                        }else if(dependency_instruction[k].instruction_type == "float_2") {
-                            if(dependency_instruction[k].identifier == "MULTD") {
+                            if(currentInstructionToDyspatch.identifier == "MULTD") {
                                 if(dependency_instruction[k].dyspatch_cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
-                            }else if(dependency_instruction[k].identifier == "DIVD"){
+                            }else {
                                 if(dependency_instruction[k].dyspatch_cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
                             }
-                        }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
-                            if(dependency_instruction[k].dyspatch_cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
-                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                        }else if(dependency_instruction[k].instruction_type == "float_2") {
+                            if(currentInstructionToDyspatch.identifier == "MULTD") {
+                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;
+                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }else {
+                                    if(dependency_instruction[k].identifier == "MULTD") {
+                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                        alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                    }else {
+                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                        alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                    }
+                                }
                             }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__  + dependency_instruction[k].dyspatch_cycle;
-                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;
+                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }else {
+                                    if(dependency_instruction[k].identifier == "MULTD") {
+                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                        alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                    }else {
+                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                        alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                    }
+                                }
+                            }
+                        }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
+                            if(currentInstructionToDyspatch.identifier == "MULTD") {
+                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;
+                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }else {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__  + dependency_instruction[k].dyspatch_cycle;
+                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }
+                            }else if(currentInstructionToDyspatch.identifier == "DIVD"){
+                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;
+                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }else {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__  + dependency_instruction[k].dyspatch_cycle;
+                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }
                             }
                         }
                     }
@@ -423,7 +471,161 @@ function exec() {
                 //     //VJ, VK, QJ, QK
 
                 // }
-                dyspatch_instructions_amount++;
+            dyspatch_instructions_amount++;
+        }else if(currentInstructionToDyspatch.instruction_type == "load") {
+            booleanControl = true;
+            Reservation_Stations_Memory.load_instructions_buffer.forEach(function(x) {
+                if(!x.disponibleBit) {
+                    booleanControl = false;
+                }
+            });
+            // for(RSelement = 0; RSelement < Reservation_Stations_Memory.load_instructions_buffer.length; RSelement++) {
+            //     if(!Reservation_Stations_Memory.load_instructions_buffer[RSelement].disponibleBit) {
+            //         booleanControl = false;
+            //     }
+            // }
+            if(booleanControl) {
+                instruction_status[dyspatch_instructions_amount][0] = cycle;
+                if(dependency_instruction.length == 0) {
+                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
+                }else {
+                    for(k = dependency_instruction.length-1 ; k >= 0 ; k--) {
+                        
+                        if(dependency_instruction[k].instruction_type == "integer") {
+                            if(dependency_instruction[k].dyspatch_cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }else {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }
+                        }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
+                            if(dependency_instruction[k].dyspatch_cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }else {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }
+                        }else if(dependency_instruction[k].instruction_type == "float_1") {
+                            if(dependency_instruction[k].dyspatch_cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }else {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }
+                        }else if(dependency_instruction[k].instruction_type == "float_2") {
+                            if(dependency_instruction[k].identifier == "MULTD") {
+                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
+                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }else {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }
+                            }else {
+                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
+                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }else {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }
+                            }
+                        }
+                    }
+                }
+                instruction_status[dyspatch_instructions_amount][2] = instruction_status[dyspatch_instructions_amount][1] + 1;
+                alert("issue: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+            }else {
+                continue;
+            }
+            // if(!x.disponibleBit) {
+            //     x.dyspatch_cycle = currentInstructionToDyspatch.dyspatch_cycle; //Functional unit receives a current dyspatch cycle;
+            //     x.disponibleBit = true; //Busy
+            //     x.OPcodeLabel = currentInstructionToDyspatch.identifier; //Instruction name
+            //     //SETAR AS FILAS, TEM Q VER SE TEM DEPENDENCIA, FALTA
+            //     //VJ, VK, QJ, QK
+            // }
+            dyspatch_instructions_amount++;
+        }else if(currentInstructionToDyspatch.instruction_type == "store") {
+            booleanControl = true;
+            Reservation_Stations_Memory.store_instructions_buffer.forEach(function(x) {
+                if(!x.disponibleBit) {
+                    booleanControl = false;
+                }
+            });
+            // for(RSelement = 0; RSelement < Reservation_Stations_Memory.store_instructions_buffer.length; RSelement++) {
+            //     if(!Reservation_Stations_Memory.store_instructions_buffer[RSelement].disponibleBit) {
+            //         booleanControl = false;
+            //     }
+            // }
+            if(booleanControl) {
+                instruction_status[dyspatch_instructions_amount][0] = cycle;
+                if(dependency_instruction.length == 0) {
+                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
+                }else {
+                    for(k = dependency_instruction.length-1 ; k >= 0 ; k--) {
+                        
+                        if(dependency_instruction[k].instruction_type == "integer") {
+                            if(dependency_instruction[k].dyspatch_cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }else {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }
+                        }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
+                            if(dependency_instruction[k].dyspatch_cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }else {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }
+                        }else if(dependency_instruction[k].instruction_type == "float_1") {
+                            if(dependency_instruction[k].dyspatch_cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }else {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }
+                        }else if(dependency_instruction[k].instruction_type == "float_2") {
+                            if(dependency_instruction[k].identifier == "MULTD") {
+                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
+                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }else {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }
+                            }else {
+                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
+                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }else {
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                                }
+                            }
+                        }
+                    }
+                }
+                instruction_status[dyspatch_instructions_amount][2] = instruction_status[dyspatch_instructions_amount][1] + 1;
+                alert("issue: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+            }else {
+                continue;
+            }
+            // if(!x.disponibleBit) {
+            //     x.dyspatch_cycle = currentInstructionToDyspatch.dyspatch_cycle; //Functional unit receives a current dyspatch cycle;
+            //     x.disponibleBit = true; //Busy
+            //     x.OPcodeLabel = currentInstructionToDyspatch.identifier; //Instruction name
+            //     //SETAR AS FILAS, TEM Q VER SE TEM DEPENDENCIA, FALTA
+            //     //VJ, VK, QJ, QK
+            // }
+            dyspatch_instructions_amount++;
         }   
     }while(dyspatch_instructions_amount < data.length);
     
