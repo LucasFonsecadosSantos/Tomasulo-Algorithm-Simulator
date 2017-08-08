@@ -172,6 +172,7 @@ function loadRegisters() {
  * 
  */
 var dyspatch_index = 1;
+document.getElementById("instructions_list_viwer").value = "";
 const confirmInst = function () {
     const Instruction = {
         dyspatch_cycle: dyspatch_index++, 
@@ -184,7 +185,11 @@ const confirmInst = function () {
 
     // alert('Instruction:', JSON.stringify(Instruction));
     data.push(Instruction);
-    document.getElementById("instructions_list_viwer").value += "-> "+Instruction.identifier + " " + Instruction.RD + " " + Instruction.RS + " " + Instruction.RT + "\n";
+    if(Instruction.instruction_type == "load" || Instruction.instruction_type == "store") {
+        document.getElementById("instructions_list_viwer").value += Instruction.dyspatch_cycle + ". "+Instruction.identifier + " " + Instruction.RD + ", " + Instruction.RS + "("+Instruction.RT+")" + "\n";
+    }else {
+        document.getElementById("instructions_list_viwer").value += Instruction.dyspatch_cycle +  ". "+Instruction.identifier + " " + Instruction.RD + ", " + Instruction.RS + ", " + Instruction.RT + "\n";
+    }
     data.forEach(function(element) {
         alert(JSON.stringify(element));
         // console.log(JSON.stringify(element));
