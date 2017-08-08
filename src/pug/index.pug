@@ -111,10 +111,10 @@ html
                     label instructions added
                     textarea(id="instructions_list_viwer") 
                 div.line.fix
-                    button(onclick="exec()") start
-                    button(id="confirmButton" type="button" onclick=="confirmInst()") confirm instruction
-                    button(onclick="clear_form()") clear the form
-                    button(onclick="window.open('help.html', '_blank')") help-me
+                    button(onclick="exec()", type="button") start
+                    button(id="confirmButton", type="button", onclick="confirmInst()") confirm instruction
+                    button(onclick="clear_form()" ,type="button") clear the form
+                    button(onclick="window.open('help.html', '_blank')", type="button") help-me
                 
     footer
         div.line

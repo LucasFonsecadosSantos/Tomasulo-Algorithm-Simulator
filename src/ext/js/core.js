@@ -40,7 +40,11 @@ const __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ = 7;
 
 const __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ = 40;
 
-const cycle_exec = new Array();
+/**
+ * Instrutction status table;
+ * A multidimensional array;
+ */
+const instruction_status = new Array(data.length);
 
 const Instruction_Reservated = {
     dyspatch_cycle: 0,
@@ -53,15 +57,13 @@ const Instruction_Reservated = {
 };
 
 const Instruction_Reservated_Memory = {
+    dyspatch_cycle: 0,
     disponibleBit: false,
     OPcodeLabel: "",
     address: ""
 };
 
 const Reservation_Stations = {
-    integer_instructions_queue:  new Array(),
-    float_instructions_queue:    new Array(),
-    float_instructions_queue_2:  new Array(),
     integer_instructions_buffer: new Array(__INTEGER_INSTRUCTIONS_BUFFER_SIZE__),
     float_instructions_buffer:   new Array(__FLOAT_INSTRUCTIONS_BUFFER_SIZE__),
     float_instructions_buffer_2: new Array(__FLOAT_INSTRUCTIONS_BUFFER_2_SIZE__)
@@ -203,50 +205,117 @@ function clear_form() {
 /**
  * 
  */
-var counter = 1;
 function exec() {
-    data.forEach(function(instruction) {
-        cycle_exec = new Array(2);
-        if(instruction_type == "integer") {
-            var control = true;
-            Reservation_Stations.integer_instructions_buffer.forEach(function(element){
-                if(element.RD == instruction.RD) {
-                    if(element.dyspatch_cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ < Instruction.dyspatch_cycle) {
-                        cycle_exec[counter][0] = instruction.dyspatch_cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;
-                    }else {
-                        cycle_exec[counter][0] = instruction.dyspatch_cycle; //paramos aqui calculando a quantidade de ciclos
+    var cycle = 0;
+    var currentInstructionToDyspatch;
+    var dyspatch_instructions_amount = 0;
+    do {
+        cycle++;
+        currentInstructionToDyspatch = data[cycle-1];
+        instruction_status[dyspatch_instructions_amount] = new Array(3);
+        
+        //Build the reservation stations if it is on the first cycle;
+        if(cycle == 1) {
+            Reservation_Stations.integer_instructions_buffer.forEach(function(newElement) {
+                newElement = Instruction_Reservated;
+            });
+            Reservation_Stations.float_instructions_buffer.forEach(function(newElement) {
+                newElement = Instruction_Reservated;
+            });
+            Reservation_Stations.float_instructions_buffer.forEach(function(newElement) {
+                newElement = Instruction_Reservated;
+            });
+            Reservation_Stations_Memory.store_instructions_buffer.forEach(function(newElement) {
+                newElement = Instruction_Reservated_Memory;
+            });
+            Reservation_Stations_Memory.load_instructions_buffer.forEach(function(newElement) {
+                newElement = Instruction_Reservated_Memory;
+            });
+        }
+
+        //Dyspatch
+        var booleanControl = true;
+        var dependency_instruction = new Array();
+        for(i = cycle-2; i >= 0; i--) {
+            if(data[i].RD == currentInstructionToDyspatch.RS || data[i].RD == currentInstructionToDyspatch.RT || data[i].RD == currentInstructionToDyspatch) {
+                dependency_instruction.push(data[i]);
+            }
+        }
+        if(currentInstructionToDyspatch.instruction_type == "integer") {
+            Reservation_Stations.integer_instructions_buffer.forEach(function(x) {
+                if(!x.disponibleBit) {
+                    booleanControl = false;
+                }
+            });
+            if(booleanControl) {
+                instruction_status[dyspatch_instructions_amount][0] = cycle;
+                if(dependency_instruction.length == 0) {
+                    instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;
+                }else {
+                    for(k = dependency_instruction.length-1 ; k >= 0 ; k--) {
+                        if(dependency_instruction[k].instruction_type == "integer") {
+                            if(dependency_instruction[k].dyspatch_cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }else {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__*2 + dependency_instruction[k].dyspatch_cycle;
+                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }
+                        }
                     }
                 }
-            });
-        }
-        cycle_exec[counter][0] = 0;//Quando a execucao termina
-        cycle_exec[counter][1] = cycle_exec[counter][0]+1;
-        if(instruction.type == "integer") {
-            Reservation_Stations.integer_instructions_buffer.forEach(function(element) {
-                if(!element.disponibleBit) {
-                    element.disponibleBit = true;
-                    element.OPcodeLabel = instruction.identifier;
-                    element.dyspatch_cycle = Instruction.dyspatch_cycle;
-                    element
-                    var d = false;
-                    
-                        
-                    });
-                    
-                }else {
-                    Reservation_Stations.integer_instructions_queue.push(instruction);
+                instruction_status[dyspatch_instructions_amount][2] = instruction_status[dyspatch_instructions_amount][1] + 1;
+                alert("issue: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+            }else {
+                continue;
+            }
+                // if(!x.disponibleBit) {
+                //     x.dyspatch_cycle = currentInstructionToDyspatch.dyspatch_cycle; //Functional unit receives a current dyspatch cycle;
+                //     x.disponibleBit = true; //Busy
+                //     x.OPcodeLabel = currentInstructionToDyspatch.identifier; //Instruction name
+                //     //SETAR AS FILAS, TEM Q VER SE TEM DEPENDENCIA, FALTA
+                //     //VJ, VK, QJ, QK
+
+                // }
+                dyspatch_instructions_amount++;
+        }else if(currentInstructionToDyspatch.instruction_type == "float") {
+            Reservation_Stations.integer_instructions_buffer.forEach(function(x) {
+                if(!x.disponibleBit) {
+                    booleanControl = false;
                 }
             });
-        }else if(instruction.type == "float") {
-            if(instruction.name == "MULTD" || instruction.name == "DIVD") {
-
+            if(booleanControl) {
+                instruction_status[dyspatch_instructions_amount][0] = cycle;
+                if(dependency_instruction.length == 0) {
+                    instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;
+                }else {
+                    for(k = dependency_instruction.length-1 ; k >= 0 ; k--) {
+                        if(dependency_instruction[k].instruction_type == "integer") {
+                            if(dependency_instruction[k].dyspatch_cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }else {
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__*2 + dependency_instruction[k].dyspatch_cycle;
+                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            }
+                        }
+                    }
+                }
+                instruction_status[dyspatch_instructions_amount][2] = instruction_status[dyspatch_instructions_amount][1] + 1;
+                alert("issue: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
             }else {
-
+                continue;
             }
-        }else if(instruction.type == "store" ) {
+                // if(!x.disponibleBit) {
+                //     x.dyspatch_cycle = currentInstructionToDyspatch.dyspatch_cycle; //Functional unit receives a current dyspatch cycle;
+                //     x.disponibleBit = true; //Busy
+                //     x.OPcodeLabel = currentInstructionToDyspatch.identifier; //Instruction name
+                //     //SETAR AS FILAS, TEM Q VER SE TEM DEPENDENCIA, FALTA
+                //     //VJ, VK, QJ, QK
 
-        }else if(instruction.type == "load") {
-
+                // }
+                dyspatch_instructions_amount++;
         }
-    });
+    }while(dyspatch_instructions_amount < data.length);
+    
 }
