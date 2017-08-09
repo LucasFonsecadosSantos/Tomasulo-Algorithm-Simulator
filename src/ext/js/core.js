@@ -258,6 +258,7 @@ function exec() {
         if(currentInstructionToDyspatch.instruction_type == "integer") {
             Reservation_Stations.integer_instructions_buffer.forEach(function(x) {
                 if(!x.disponibleBit) {
+                    alert("EITA TIO");
                     booleanControl = false;
                 }
             });
@@ -291,6 +292,8 @@ function exec() {
                 instruction_status[dyspatch_instructions_amount][2] = instruction_status[dyspatch_instructions_amount][1] + 1;
                 alert("issue: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
             }else {
+                cycle++;
+                alert("caiu");
                 continue;
             }
             // if(!x.disponibleBit) {
@@ -334,7 +337,7 @@ function exec() {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
+                                    instruction_status[dyspatch_instructions_amount][1] = __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__//instruction_status[dependency_instruction[k].dyspatch_cycle-1][2];// + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
                             }else if(dependency_instruction[k].identifier == "DIVD"){
@@ -362,6 +365,7 @@ function exec() {
                 instruction_status[dyspatch_instructions_amount][2] = instruction_status[dyspatch_instructions_amount][1] + 1;
                 alert("issue: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
             }else {
+                cycle++;
                 continue;
             }
                 // if(!x.disponibleBit) {
@@ -416,7 +420,7 @@ function exec() {
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
                                     if(dependency_instruction[k].identifier == "MULTD") {
-                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
+                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                         alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                     }else {
                                         instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
@@ -424,7 +428,7 @@ function exec() {
                                     }
                                 }
                             }else {
-                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
+                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
@@ -461,6 +465,7 @@ function exec() {
                 instruction_status[dyspatch_instructions_amount][2] = instruction_status[dyspatch_instructions_amount][1] + 1;
                 alert("issue: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
             }else {
+                cycle++;
                 continue;
             }
                 // if(!x.disponibleBit) {
@@ -539,6 +544,7 @@ function exec() {
                 instruction_status[dyspatch_instructions_amount][2] = instruction_status[dyspatch_instructions_amount][1] + 1;
                 alert("issue: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
             }else {
+                cycle++;
                 continue;
             }
             // if(!x.disponibleBit) {
@@ -616,6 +622,7 @@ function exec() {
                 instruction_status[dyspatch_instructions_amount][2] = instruction_status[dyspatch_instructions_amount][1] + 1;
                 alert("issue: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
             }else {
+                cycle++;
                 continue;
             }
             // if(!x.disponibleBit) {
@@ -628,5 +635,98 @@ function exec() {
             dyspatch_instructions_amount++;
         }   
     }while(dyspatch_instructions_amount < data.length);
-    
+    renderizeResults();
+}
+
+function renderizeResults() {
+    var exec_table = "";
+    for(i = 0; i < instruction_status.length; i++) {
+        exec_table += "<tr>";
+        for(j = 0; j < 3; j++) {
+            exec_table += "<td><p>" + instruction_status[i][j] + "</p></td>";
+        }
+        exec_table += "</tr>";
+    }
+    var myWindow = window.open("", "_blank", "toolbar=yes,scrollbars=yes,resizable=no,top=500,left=500,width=600px,height=400px");
+    myWindow.document.write(+
+    "<!DOCTYPE html>"+
+    "<html>"+
+        "<head>"+
+            "<title>teste</title>"+
+            "<style>"+
+                "* {"+
+                    "margin: 0px auto;"+
+                    "padding: 0px;"+
+                "}"+
+                "body {"+
+                    "background-color: #333399;"+
+                "}"+
+                "thead, tr:first-child {"+
+                    "background: #FFF !important;"+
+                "}"+
+                "h1 {"+
+                    "text-transform: uppercase;"+
+                    "color: #333399;"+
+                "}"+
+                "table {"+
+                    "width: 90%;"+
+                    "border: solid 2px #fff;"+
+                    "border-radius: 10px;"+
+                    "-o-border-radius: 10px;"+
+                    "-ms-border-radius: 10px;"+
+                    "-moz-border-radius: 10px;"+
+                    "-webkit-border-radius: 10px;"+
+                    "text-align: center !important;"+
+                "}"+
+                "tr {"+
+                    "border-bottom: solid 1px #396afc;"+
+                "}"+
+                "td {"+
+                    "padding: 5px !important;"+
+                    "font-family: 'courier-new', sans-serif;"+
+                    "transition: 0.8s;"+
+                    "-o-transition: 0.8s;"+
+                    "-ms-transition: 0.8s;"+
+                    "-moz-transition: 0.8s;"+
+                    "-webkit-transition: 0.8s;"+
+                "}"+
+                "tr::last-child td {"+
+                    "border: none;"+
+                "}"+
+                "td:hover {"+
+                    "background: rgba(255,255,255,0.3);"+
+                    "transition: 0.8s;"+
+                    "-o-transition: 0.8s;"+
+                    "-ms-transition: 0.8s;"+
+                    "-moz-transition: 0.8s;"+
+                    "-webkit-transition: 0.8s;"+
+                    ""+
+                "}"+
+                "p {"+
+                    "font-size: 20px;"+
+                "}"+
+            "</style>"+
+        "</head>"+
+            "<body>"+
+                "<main>"+
+                    "<center>"+
+                        "<table>"+
+                            "<thead>"+
+                                "<tr>"+
+                                    "<td colspan='3'><h1>Execution Table</h1></td>"+
+                                "</tr>"+
+                            "</thead>"+
+                            "<tbody>"+
+                                "<tr>"+
+                                    "<td>ISSUE:</td>"+
+                                    "<td>EXEC FINISHED:</td>"+
+                                    "<td>WRITE:</td>"+
+                                "</tr>"+
+                                exec_table
+                            +"</tbody>"+
+                        "</table>"+
+                    "</center>"+
+                "</main>"+
+            "</body>"+
+    "</html>");
 }
