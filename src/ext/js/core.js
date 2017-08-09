@@ -32,11 +32,11 @@ const __INTEGER_INSTRUCTIONS_BUFFER_SIZE__  = 3;
 
 const __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ = 1;
 
-const __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ = 1;
+const __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ = 2;
 
-const __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ = 3;
+const __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ = 2;
 
-const __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ = 7;
+const __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ = 10;
 
 const __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ = 40;
 
@@ -195,10 +195,10 @@ const confirmInst = function () {
     }else {
         document.getElementById("instructions_list_viwer").value += Instruction.dyspatch_cycle +  ". "+Instruction.identifier + " " + Instruction.RD + ", " + Instruction.RS + ", " + Instruction.RT + "\n";
     }
-    data.forEach(function(element) {
-        alert(JSON.stringify(element));
-        // console.log(JSON.stringify(element));
-    }, this);
+    // data.forEach(function(element) {
+    //     alert(JSON.stringify(element));
+    //     // console.log(JSON.stringify(element));
+    // }, this);
 };
 
 /**
@@ -211,6 +211,23 @@ function clear_form() {
     }
 }
 
+function buildReservationStations() {
+    Reservation_Stations.integer_instructions_buffer.forEach(function(newElement) {
+        newElement = Instruction_Reservated;
+    });
+    Reservation_Stations.float_instructions_buffer.forEach(function(newElement) {
+        newElement = Instruction_Reservated;
+    });
+    Reservation_Stations.float_instructions_buffer_2.forEach(function(newElement) {
+        newElement = Instruction_Reservated;
+    });
+    Reservation_Stations_Memory.store_instructions_buffer.forEach(function(newElement) {
+        newElement = Instruction_Reservated_Memory;
+    });
+    Reservation_Stations_Memory.load_instructions_buffer.forEach(function(newElement) {
+        newElement = Instruction_Reservated_Memory;
+    });
+}
 
 /**
  * 
@@ -226,21 +243,7 @@ function exec() {
         
         //Build the reservation stations if it is on the first cycle;
         if(cycle == 1) {
-            Reservation_Stations.integer_instructions_buffer.forEach(function(newElement) {
-                newElement = Instruction_Reservated;
-            });
-            Reservation_Stations.float_instructions_buffer.forEach(function(newElement) {
-                newElement = Instruction_Reservated;
-            });
-            Reservation_Stations.float_instructions_buffer_2.forEach(function(newElement) {
-                newElement = Instruction_Reservated;
-            });
-            Reservation_Stations_Memory.store_instructions_buffer.forEach(function(newElement) {
-                newElement = Instruction_Reservated_Memory;
-            });
-            Reservation_Stations_Memory.load_instructions_buffer.forEach(function(newElement) {
-                newElement = Instruction_Reservated_Memory;
-            });
+            buildReservationStations();
         }
 
         //Dyspatch
@@ -251,17 +254,14 @@ function exec() {
                 dependency_instruction.push(data[i]);
             }
         }
+
         if(currentInstructionToDyspatch.instruction_type == "integer") {
             Reservation_Stations.integer_instructions_buffer.forEach(function(x) {
                 if(!x.disponibleBit) {
                     booleanControl = false;
                 }
             });
-            // for(RSelement = 0; RSelement < Reservation_Stations.integer_instructions_buffer.length; RSelement++) {
-            //     if(!Reservation_Stations.integer_instructions_buffer[RSelement].disponibleBit) {
-            //         booleanControl = false;
-            //     }
-            // }
+            
             if(booleanControl) {
                 instruction_status[dyspatch_instructions_amount][0] = cycle;
                 if(dependency_instruction.length == 0) {
@@ -274,7 +274,7 @@ function exec() {
                                 instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;
                                 alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                 alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
@@ -282,7 +282,7 @@ function exec() {
                                 instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;
                                 alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ ;//+ dependency_instruction[k].dyspatch_cycle;
                                 alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }
@@ -325,7 +325,7 @@ function exec() {
                                 instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
                                 alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                 alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }else if(dependency_instruction[k].instruction_type == "float_2") {
@@ -334,7 +334,7 @@ function exec() {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
                             }else if(dependency_instruction[k].identifier == "DIVD"){
@@ -342,7 +342,7 @@ function exec() {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
                             }
@@ -352,7 +352,7 @@ function exec() {
                                 //alert(" ciclo: "+cycle + "mem: "+__MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__+" flost "+__FLOAT_INSTRUCTION_CYCLES_AMOUNT__+ "DESPACHO "+dependency_instruction[k].dyspatch_cycle);
                                 alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__  + dependency_instruction[k].dyspatch_cycle;
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__; //+ dependency_instruction[k].dyspatch_cycle;
                                 //alert(" ciclo: "+cycle + "mem: "+__MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__+" flost "+__FLOAT_INSTRUCTION_CYCLES_AMOUNT__+ "DESPACHO "+dependency_instruction[k].dyspatch_cycle);
                                 alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
@@ -397,7 +397,7 @@ function exec() {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
                             }else {
@@ -405,7 +405,7 @@ function exec() {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
                             }
@@ -416,23 +416,23 @@ function exec() {
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
                                     if(dependency_instruction[k].identifier == "MULTD") {
-                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                         alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                     }else {
-                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                         alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                     }
                                 }
                             }else {
-                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
+                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
                                     if(dependency_instruction[k].identifier == "MULTD") {
-                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                         alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                     }else {
-                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                         alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                     }
                                 }
@@ -443,7 +443,7 @@ function exec() {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__  + dependency_instruction[k].dyspatch_cycle;
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ ;// + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
                             }else if(currentInstructionToDyspatch.identifier == "DIVD"){
@@ -451,7 +451,7 @@ function exec() {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__  + dependency_instruction[k].dyspatch_cycle;
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;//  + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
                             }
@@ -496,7 +496,7 @@ function exec() {
                                 instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
                                 alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                 alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
@@ -504,7 +504,7 @@ function exec() {
                                 instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
                                 alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                 alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }else if(dependency_instruction[k].instruction_type == "float_1") {
@@ -512,7 +512,7 @@ function exec() {
                                 instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
                                 alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                 alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }else if(dependency_instruction[k].instruction_type == "float_2") {
@@ -521,7 +521,7 @@ function exec() {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
                             }else {
@@ -529,7 +529,7 @@ function exec() {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
                             }
@@ -573,7 +573,7 @@ function exec() {
                                 instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
                                 alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                 alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
@@ -581,7 +581,7 @@ function exec() {
                                 instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
                                 alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                 alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }else if(dependency_instruction[k].instruction_type == "float_1") {
@@ -589,7 +589,7 @@ function exec() {
                                 instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
                                 alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                 alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }else if(dependency_instruction[k].instruction_type == "float_2") {
@@ -598,7 +598,7 @@ function exec() {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
                             }else {
@@ -606,7 +606,7 @@ function exec() {
                                     instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + dependency_instruction[k].dyspatch_cycle;
+                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                     alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }
                             }
