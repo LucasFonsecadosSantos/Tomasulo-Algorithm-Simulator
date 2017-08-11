@@ -108,8 +108,95 @@ html
                         label RT Register / Label
                         select(type="text", placeholder="teste", id="registers_list03")
                 div.line
-                    label INSTRUCTIONS ADDED
+                    label
+                        span#instructions_counter
+                        |  INSTRUCTIONS ADDED
                     textarea(id="instructions_list_viwer", title="Instructions entered by the user", alt="ola debora", rows="10") 
+                    p#informations 
+                        |  |  F0: 
+                        i#f0_counter 0
+                        |  | F2:
+                        i#f1_counter 0
+                        |  | F4:
+                        i#f2_counter 0
+                        |  | F6:
+                        i#f3_counter 0
+                        |  | F8:
+                        i#f4_counter 0
+                        |  | F10:
+                        i#f5_counter 0
+                        |  | F12:
+                        i#f6_counter 0
+                        |  | F14:
+                        i#f7_counter 0
+                        |  | F16:
+                        i#f8_counter 0
+                        |  | R0:
+                        i#r0_counter 0
+                        |  | R1:
+                        i#r1_counter 0
+                        |  | R2:
+                        i#r2_counter 0
+                        |  | R3:
+                        i#r3_counter 0
+                        |  | R4:
+                        i#r4_counter 0
+                        |  | R5:
+                        i#r5_counter 0
+                        |  | R6:
+                        i#r6_counter 0
+                        |  | R7:
+                        i#r7_counter 0
+                        |  | R8:
+                        i#r8_counter 0
+                        |  | R9:
+                        i#r9_counter 0
+                        |  | R10:
+                        i#r10_counter 0
+                        |  | R11:
+                        i#r11_counter 0
+                        |  | R12:
+                        i#r12_counter 0
+                        |  | R13:
+                        i#r13_counter 0
+                        |  | R14:
+                        i#r14_counter 0
+                        |  | R15:
+                        i#r16_counter 0
+                        |  | R16:
+                        i#r16_counter 0
+                        |  | R17:
+                        i#r17_counter 0
+                        |  | R18:
+                        i#r18_counter 0
+                        |  | R19:
+                        i#r19_counter 0
+                        |  | R20:
+                        i#r20_counter 0
+                        |  | R21:
+                        i#r21_counter 0
+                        |  | R22:
+                        i#r22_counter 0
+                        |  | R23:
+                        i#r23_counter 0
+                        |  | R24:
+                        i#r24_counter 0
+                        |  | R25:
+                        i#r25_counter 0
+                        |  | R26:
+                        i#r26_counter 0
+                        |  | R27:
+                        i#r27_counter 0
+                        |  | R28:
+                        i#r28_counter 0
+                        |  | R29:
+                        i#r29_counter 0
+                        |  | R30:
+                        i#r30_counter 0
+                        |  | R31:
+                        i#r31_counter 0
+                        |  | R32:
+                        i#r32_counter 0
         div.line.fix
             button(onclick="exec()", type="button") start
             button(id="confirmButton", type="button", onclick="confirmInst()") confirm instruction

@@ -100,7 +100,7 @@ function getTypeRRegisters() {
 }
 
 /**
- * 
+ * This function load 
  */
 function loadRegisters() {
 
@@ -173,12 +173,107 @@ function loadRegisters() {
     }
 }
 
+function updateInformations(object) {
+    switch(object.RD) {
+        case "F0":
+            counter_float_registers[0]++;
+            break;
+        case "F2":
+            counter_float_registers[1]++;
+            break;
+        case "F4":
+            counter_float_registers[2]++;
+            break;
+        case "F6":
+            counter_float_registers[3]++;
+            break;
+        case "F8":
+            counter_float_registers[4]++;
+            break;
+        case "F10":
+            counter_float_registers[5]++;
+            break;
+        case "F12":
+            counter_float_registers[6]++;
+            break;
+        case "F14":
+            counter_float_registers[7]++;
+            break;
+        case "F16":
+            counter_float_registers[8]++;
+            break;
+    }
+    switch(object.RS) {
+        case "F0":
+            counter_float_registers[0]++;
+            break;
+        case "F2":
+            counter_float_registers[1]++;
+            break;
+        case "F4":
+            counter_float_registers[2]++;
+            break;
+        case "F6":
+            counter_float_registers[3]++;
+            break;
+        case "F8":
+            counter_float_registers[4]++;
+            break;
+        case "F10":
+            counter_float_registers[5]++;
+            break;
+        case "F12":
+            counter_float_registers[6]++;
+            break;
+        case "F14":
+            counter_float_registers[7]++;
+            break;
+        case "F16":
+            counter_float_registers[8]++;
+            break;
+    }
+    switch(object.RT) {
+        case "F0":
+            counter_float_registers[0]++;
+            break;
+        case "F2":
+            counter_float_registers[1]++;
+            break;
+        case "F4":
+            counter_float_registers[2]++;
+            break;
+        case "F6":
+            counter_float_registers[3]++;
+            break;
+        case "F8":
+            counter_float_registers[4]++;
+            break;
+        case "F10":
+            counter_float_registers[5]++;
+            break;
+        case "F12":
+            counter_float_registers[6]++;
+            break;
+        case "F14":
+            counter_float_registers[7]++;
+            break;
+        case "F16":
+            counter_float_registers[8]++;
+            break;
+    }
+    for(i=0; i<counter_float_registers.length; i++) {
+        document.getElementById("f"+i+"_counter").innerHTML = counter_float_registers[i];
+    }
+}
+
 /**
  * 
  */
 var dyspatch_index = 1;
+var counter_float_registers = [0,0,0,0,0,0,0,0];
 document.getElementById("instructions_list_viwer").value = "";
 const confirmInst = function () {
+    document.getElementById("instructions_counter").innerText = dyspatch_index;
     const Instruction = {
         dyspatch_cycle: dyspatch_index++, 
         identifier: document.getElementById("instruction_name").value,
@@ -187,7 +282,7 @@ const confirmInst = function () {
         RS: document.getElementById("registers_list02").value,
         RT: document.getElementById("registers_list03").value
     }
-
+    updateInformations(Instruction);
     // alert('Instruction:', JSON.stringify(Instruction));
     data.push(Instruction);
     if(Instruction.instruction_type == "load" || Instruction.instruction_type == "store") {
@@ -579,6 +674,12 @@ function exec() {
     renderizeResults();
 }
 
+/**
+ * This function is responsible for rendering and
+ * compiling through a table and shows it for the user.
+ * It generates a new html page with tables and all proccessing
+ * content.
+ */
 function renderizeResults() {
     var exec_table = "";
     for(i = 0; i < instruction_status.length; i++) {
@@ -673,28 +774,27 @@ function renderizeResults() {
     "</html>");
 }
 
+/**
+ * This is an array to store all
+ * page backgrounds colors for makes
+ * a gradient UI design.
+ */
 var colors = new Array(
   [131,58,180],
   [253, 29, 29],
   [253, 29, 29],
-  [252, 176, 69]);
-//   [5, 117, 230],
-//   [2, 27, 121],
-//   [71, 118, 230],
-//   [142, 84, 233],
-//     [103, 58, 18],
-//   [81, 45, 168]);
+  [252, 176, 69]
+);
 var step = 0;
-//color table indices for: 
-// current color left
-// next color left
-// current color right
-// next color right
 var colorIndices = [0,1,2,3];
 
 //transition speed
-var gradientSpeed = 0.0001;
+var gradientSpeed = 0.001;
 
+/**
+ * This method generates a lot of transitios
+ * based on the colors
+ */
 function updateGradient() {
   
   if ( $===undefined ) return;
@@ -716,8 +816,11 @@ function updateGradient() {
     var color2 = "rgb("+r2+","+g2+","+b2+")";
 
     $('body').css({
-    background: "-webkit-gradient(linear, left top, right top, from("+color1+"), to("+color2+"))"}).css({
-        background: "-moz-linear-gradient(left, "+color1+" 0%, "+color2+" 100%)"});
+        background: "-webkit-gradient(linear, left top, right top, from("+color1+"), to("+color2+"))"}).css({
+        background: "-moz-linear-gradient(left, "+color1+" 0%, "+color2+" 100%)"}).css({
+        background: "-ms-linear-gradient(left, "+color1+" 0%, "+color2+" 100%)"}).css({
+        background: "-o-linear-gradient(left, "+color1+" 0%, "+color2+" 100%)"}).css({
+        background: "linear-gradient(left, "+color1+" 0%, "+color2+" 100%)"});
     
     step += gradientSpeed;
     if ( step >= 1 )
