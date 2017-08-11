@@ -230,13 +230,43 @@ function buildReservationStations() {
 }
 
 /**
+ * This function is reponsible for returns for the caller function the execution 
+ * delay calculation when the current instruction to dyspatch has a one or more
+ * dependencys. It works receving the current algorithm cycle, a dependency instruction
+ * dyspatch cycle, a dyspatch amount to know the dependency array lenght, a current
+ * instruction constant latency value, defined by the application settings, a dependency
+ * instruction constant latency value and the current status table.
+ * 
+ * It verifys if total execution time of dependency instruction is greater than current
+ * instructions execution time, if yes, the dependency found, the dependency executation
+ * time will interfere with the current execution.
+ * 
+ * @param {*} dependencyInstructionDyspatchCycle 
+ * @param {*} dyspatchAmount 
+ * @param {*} currentCycle 
+ * @param {*} statusTable 
+ * @param {*} dependencyInstructionLatency 
+ * @param {*} currentInstructionLatency 
+ */
+function toSolveExecDelay(dependencyInstructionDyspatchCycle, dyspatchAmount, currentCycle, dependencyInstructionLatency, currentInstructionLatency) {
+    if(dependencyInstructionDyspatchCycle + dependencyInstructionLatency < currentCycle) 
+    {
+        return currentCycle + currentInstructionLatency;
+    }else {
+        return currentCycle + dependencyInstructionLatency + currentInstructionLatency;// + dependency_instruction[k].dyspatch_cycle;
+    }
+}
+
+/**
  * 
  */
 function exec() {
     var cycle = 0;
     var currentInstructionToDyspatch;
     var dyspatch_instructions_amount = 0;
+    
     do {
+        
         cycle++;
         currentInstructionToDyspatch = data[cycle-1];
         instruction_status[dyspatch_instructions_amount] = new Array(3);
@@ -249,6 +279,7 @@ function exec() {
         //Dyspatch
         var booleanControl = true;
         var dependency_instruction = new Array();
+        
         for(i = cycle-2; i >= 0; i--) {
             if(data[i].RD == currentInstructionToDyspatch.RS || data[i].RD == currentInstructionToDyspatch.RT) {
                 dependency_instruction.push(data[i]);
@@ -271,21 +302,12 @@ function exec() {
                     for(k = dependency_instruction.length-1 ; k >= 0 ; k--) {
                         
                         if(dependency_instruction[k].instruction_type == "integer") {
-                            if(dependency_instruction[k].dyspatch_cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;
-                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }
+                            instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__);
+                            alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                            
                         }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
-                            if(dependency_instruction[k].dyspatch_cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__;
-                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ ;//+ dependency_instruction[k].dyspatch_cycle;
-                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }
+                            instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__);
+                            alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                         }
                     }
                 }
@@ -304,6 +326,7 @@ function exec() {
             //     //VJ, VK, QJ, QK
             // }
             dyspatch_instructions_amount++;
+        
         }else if(currentInstructionToDyspatch.instruction_type == "float_1") {
             booleanControl = true;
             Reservation_Stations.float_instructions_buffer.forEach(function(x) {
@@ -324,41 +347,19 @@ function exec() {
                     for(k = dependency_instruction.length-1 ; k >= 0 ; k--) {
                         
                         if(dependency_instruction[k].instruction_type == "float_1") {
-                            if(dependency_instruction[k].dyspatch_cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
-                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }
+                            instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __FLOAT_INSTRUCTION_CYCLES_AMOUNT__, __FLOAT_INSTRUCTION_CYCLES_AMOUNT__);
+                            alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                         }else if(dependency_instruction[k].instruction_type == "float_2") {
                             if(dependency_instruction[k].identifier == "MULTD") {
-                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
-                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__//instruction_status[dependency_instruction[k].dyspatch_cycle-1][2];// + dependency_instruction[k].dyspatch_cycle;
-                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }
+                                instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__, __FLOAT_INSTRUCTION_CYCLES_AMOUNT__);
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else if(dependency_instruction[k].identifier == "DIVD"){
-                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
-                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }
+                                instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__, __FLOAT_INSTRUCTION_CYCLES_AMOUNT__);
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
-                            if(dependency_instruction[k].dyspatch_cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__;
-                                //alert(" ciclo: "+cycle + "mem: "+__MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__+" flost "+__FLOAT_INSTRUCTION_CYCLES_AMOUNT__+ "DESPACHO "+dependency_instruction[k].dyspatch_cycle);
-                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__; //+ dependency_instruction[k].dyspatch_cycle;
-                                //alert(" ciclo: "+cycle + "mem: "+__MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__+" flost "+__FLOAT_INSTRUCTION_CYCLES_AMOUNT__+ "DESPACHO "+dependency_instruction[k].dyspatch_cycle);
-                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }
+                            instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__, __FLOAT_INSTRUCTION_CYCLES_AMOUNT__);
+                            alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                         }
                     }
                 }
@@ -397,21 +398,11 @@ function exec() {
                         
                         if(dependency_instruction[k].instruction_type == "float_1") {
                             if(currentInstructionToDyspatch.identifier == "MULTD") {
-                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;
-                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }
+                                instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__, __FLOAT_INSTRUCTION_CYCLES_AMOUNT__);
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;
-                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }
+                                instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__, __FLOAT_INSTRUCTION_CYCLES_AMOUNT__);
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }else if(dependency_instruction[k].instruction_type == "float_2") {
                             if(currentInstructionToDyspatch.identifier == "MULTD") {
@@ -420,7 +411,7 @@ function exec() {
                                     alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                 }else {
                                     if(dependency_instruction[k].identifier == "MULTD") {
-                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTIONS_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
+                                        instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
                                         alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                                     }else {
                                         instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
@@ -497,46 +488,21 @@ function exec() {
                     for(k = dependency_instruction.length-1 ; k >= 0 ; k--) {
                         
                         if(dependency_instruction[k].instruction_type == "integer") {
-                            if(dependency_instruction[k].dyspatch_cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
-                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }
+                            instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
+                            alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                         }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
-                            if(dependency_instruction[k].dyspatch_cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
-                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }
+                            instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
+                            alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                         }else if(dependency_instruction[k].instruction_type == "float_1") {
-                            if(dependency_instruction[k].dyspatch_cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
-                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }
+                            instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __FLOAT_INSTRUCTION_CYCLES_AMOUNT__, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
+                            alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                         }else if(dependency_instruction[k].instruction_type == "float_2") {
                             if(dependency_instruction[k].identifier == "MULTD") {
-                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
-                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }
+                                instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
-                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }
+                                instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }
                     }
@@ -575,46 +541,21 @@ function exec() {
                     for(k = dependency_instruction.length-1 ; k >= 0 ; k--) {
                         
                         if(dependency_instruction[k].instruction_type == "integer") {
-                            if(dependency_instruction[k].dyspatch_cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
-                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }
+                            instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
+                            alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                         }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
-                            if(dependency_instruction[k].dyspatch_cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ < cycle) {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
-                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }
+                            instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
+                            alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                         }else if(dependency_instruction[k].instruction_type == "float_1") {
-                            if(dependency_instruction[k].dyspatch_cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
-                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }else {
-                                instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                            }
+                            instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __FLOAT_INSTRUCTION_CYCLES_AMOUNT__, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
+                            alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                         }else if(dependency_instruction[k].instruction_type == "float_2") {
                             if(dependency_instruction[k].identifier == "MULTD") {
-                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
-                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }
+                                instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __FLOAT_MULTD_INSTRUCTION_CYCLES_AMOUNT__, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }else {
-                                if(dependency_instruction[k].dyspatch_cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ < cycle) {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
-                                    alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }else {
-                                    instruction_status[dyspatch_instructions_amount][1] = cycle + __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__ + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;// + dependency_instruction[k].dyspatch_cycle;
-                                    alert("issue ciclo despacho + ex > ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
-                                }
+                                instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __FLOAT_DIVD_INSTRUCTION_CYCLES_AMOUNT__, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
+                                alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             }
                         }
                     }
@@ -669,7 +610,7 @@ function renderizeResults() {
                     "color: #333399;"+
                 "}"+
                 "table {"+
-                    "width: 90%;"+
+                    "width: 70%;"+
                     "border: solid 2px #fff;"+
                     "border-radius: 10px;"+
                     "-o-border-radius: 10px;"+
@@ -679,7 +620,7 @@ function renderizeResults() {
                     "text-align: center !important;"+
                 "}"+
                 "tr {"+
-                    "border-bottom: solid 1px #396afc;"+
+                    "border: solid 1px #FFF !important;"+
                 "}"+
                 "td {"+
                     "padding: 5px !important;"+
@@ -693,7 +634,7 @@ function renderizeResults() {
                 "tr::last-child td {"+
                     "border: none;"+
                 "}"+
-                "td:hover {"+
+                "tr:hover {"+
                     "background: rgba(255,255,255,0.3);"+
                     "transition: 0.8s;"+
                     "-o-transition: 0.8s;"+
@@ -704,6 +645,7 @@ function renderizeResults() {
                 "}"+
                 "p {"+
                     "font-size: 20px;"+
+                    "color: #FFF"+
                 "}"+
             "</style>"+
         "</head>"+
@@ -730,3 +672,66 @@ function renderizeResults() {
             "</body>"+
     "</html>");
 }
+
+var colors = new Array(
+  [131,58,180],
+  [253, 29, 29],
+  [253, 29, 29],
+  [252, 176, 69]);
+//   [5, 117, 230],
+//   [2, 27, 121],
+//   [71, 118, 230],
+//   [142, 84, 233],
+//     [103, 58, 18],
+//   [81, 45, 168]);
+var step = 0;
+//color table indices for: 
+// current color left
+// next color left
+// current color right
+// next color right
+var colorIndices = [0,1,2,3];
+
+//transition speed
+var gradientSpeed = 0.0001;
+
+function updateGradient() {
+  
+  if ( $===undefined ) return;
+  
+    var c0_0 = colors[colorIndices[0]];
+    var c0_1 = colors[colorIndices[1]];
+    var c1_0 = colors[colorIndices[2]];
+    var c1_1 = colors[colorIndices[3]];
+
+    var istep = 1 - step;
+    var r1 = Math.round(istep * c0_0[0] + step * c0_1[0]);
+    var g1 = Math.round(istep * c0_0[1] + step * c0_1[1]);
+    var b1 = Math.round(istep * c0_0[2] + step * c0_1[2]);
+    var color1 = "rgb("+r1+","+g1+","+b1+")";
+
+    var r2 = Math.round(istep * c1_0[0] + step * c1_1[0]);
+    var g2 = Math.round(istep * c1_0[1] + step * c1_1[1]);
+    var b2 = Math.round(istep * c1_0[2] + step * c1_1[2]);
+    var color2 = "rgb("+r2+","+g2+","+b2+")";
+
+    $('body').css({
+    background: "-webkit-gradient(linear, left top, right top, from("+color1+"), to("+color2+"))"}).css({
+        background: "-moz-linear-gradient(left, "+color1+" 0%, "+color2+" 100%)"});
+    
+    step += gradientSpeed;
+    if ( step >= 1 )
+    {
+        step %= 1;
+        colorIndices[0] = colorIndices[1];
+        colorIndices[2] = colorIndices[3];
+        
+        //pick two new target color indices
+        //do not pick the same as the current one
+        colorIndices[1] = ( colorIndices[1] + Math.floor( 1 + Math.random() * (colors.length - 1))) % colors.length;
+        colorIndices[3] = ( colorIndices[3] + Math.floor( 1 + Math.random() * (colors.length - 1))) % colors.length;
+        
+    }
+}
+
+setInterval(updateGradient,50);

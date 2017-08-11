@@ -51,8 +51,7 @@
 body
    overflow: hidden
    background: #ff00cc
-   background: -webkit-linear-gradient(to right, #333399, #ff00cc)
-   background: linear-gradient(to right, #333399, #ff00cc)
+   
    max-height: 100vh 
    min-height: 100vh
 
@@ -303,6 +302,8 @@ button
     border: none
     padding: 15px
     margin-top: 15px
+    margin-left: 2px
+    margin-right: 2px
     font:
         color: #333399
         weight: 200
@@ -314,11 +315,11 @@ button
     &:first-child
         border-top-left-radius: 8px
         border-bottom-left-radius: 8px
-        margin-right: 2.5px
+        margin-right: 2.0px
     &:last-child
         border-top-right-radius: 8px
         border-bottom-right-radius: 8px
-        margin-left: 2.5px
+        margin-left: 2.0px
 table
     
 //-------------------------------------------------------------------------------//
@@ -366,9 +367,11 @@ main
     padding: 50px 0px 0px 0px
     form
         @extend .container
+        .line:last-child
+            margin-top: 40px
     .subForm
         @include responsive_system(3,3,3,3)
-        padding: 0px
+        padding: 0px 5px 0px 5px
         &:first-child
             padding-right: 5px !important
         &:last-child

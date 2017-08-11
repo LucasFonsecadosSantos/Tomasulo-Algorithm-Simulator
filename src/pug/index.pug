@@ -84,7 +84,7 @@ html
             form()
                 div.line
                     div.subForm
-                        label instruction
+                        label Instruction
                         select(type="text", placeholder="teste",onclick="loadRegisters()", id="instruction_name")
                             option(value="ADDD") ADDD
                             option(value="SUBD") SUBD
@@ -108,21 +108,16 @@ html
                         label RT Register / Label
                         select(type="text", placeholder="teste", id="registers_list03")
                 div.line
-                    label instructions added
-                    textarea(id="instructions_list_viwer", placeholder="Instructions Entered to Proccess...", title="Instructions entered by the user", alt="ola debora", rows="10") 
-                div.line.fix
-                    button(onclick="exec()", type="button") start
-                    button(id="confirmButton", type="button", onclick="confirmInst()") confirm instruction
-                    button(onclick="clear_form()" ,type="button") clear the form
-                    button(onclick="settings()" ,type="button") settings
-                    button(onclick="window.open('help.html', '_blank')", type="button") help-me
+                    label INSTRUCTIONS ADDED
+                    textarea(id="instructions_list_viwer", title="Instructions entered by the user", alt="ola debora", rows="10") 
+        div.line.fix
+            button(onclick="exec()", type="button") start
+            button(id="confirmButton", type="button", onclick="confirmInst()") confirm instruction
+            button(onclick="clear_form()" ,type="button") clear the form
+            button(onclick="settings()" ,type="button") settings
+            button(onclick="window.open('help.html', '_blank')", type="button") help-me
                 
     footer
-        div.line
-            div.titleSection
-                h2.white-title
-                    |
-                    p
         #copyright
             p
                 | All rights 
