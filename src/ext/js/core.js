@@ -614,12 +614,21 @@ function buildReservationStations() {
  * @param {*} dependencyInstructionLatency 
  * @param {*} currentInstructionLatency 
  */
+function toSolveExecDelay(currentCycle, writerCycleDependencyInstruction, currentInstructionLatency, dependencyInstructionDyspatchCycle, dependencyInstructionLatency) {
+    if(dependencyInstructionDyspatchCycle + dependencyInstructionLatency < currentCycle) 
+    {
+        return eval(currentCycle + currentInstructionLatency);
+    }else {
+        return eval(writerCycleDependecyInstruction + currentInstructionLatency + 1);// + dependency_instruction[k].dyspatch_cycle;
+    }
+} 
+
 function toSolveExecDelay(dependencyInstructionDyspatchCycle, dyspatchAmount, currentCycle, dependencyInstructionLatency, currentInstructionLatency) {
     if(dependencyInstructionDyspatchCycle + dependencyInstructionLatency < currentCycle) 
     {
-        return currentCycle + currentInstructionLatency;
+        return eval(currentCycle + currentInstructionLatency);
     }else {
-        return currentCycle + dependencyInstructionLatency + currentInstructionLatency;// + dependency_instruction[k].dyspatch_cycle;
+        return eval(currentCycle + dependencyInstructionLatency + currentInstructionLatency);// + dependency_instruction[k].dyspatch_cycle;
     }
 }
 
@@ -709,7 +718,12 @@ function exec() {
                     for(k = dependency_instruction.length-1 ; k >= 0 ; k--) {
                         
                         if(dependency_instruction[k].instruction_type == "integer") {
-                            instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__);
+							for(run=0 ; run<instruction_status.length; run++) {
+								if(dependency_instruction[k].id == instruction_status[run][3]) {
+									instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(cycle, instruction_status[run][2], __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__, dependency_instruction[k].dyspatch_cycle, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__);
+								}
+							}
+                            //instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__);
                             alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                             /*
                             for(i=0 ; i < __INTEGER_INSTRUCTIONS_BUFFER_SIZE__; i++) {
@@ -724,12 +738,18 @@ function exec() {
                                 }
                             }*/
                         }else if(dependency_instruction[k].instruction_type == "load" || dependency_instruction[k].instruction_type == "store") {
+							for(run=0 ; run<instruction_status.length; run++) {
+								if(dependency_instruction[k].id == instruction_status[run][3]) {
+									instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(cycle, instruction_status[run][2], __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__, dependency_instruction[k].dyspatch_cycle, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__);
+								}
+							}
                             instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(dependency_instruction[k].dyspatch_cycle, dyspatch_instructions_amount, cycle, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__);
                             // alert("issue ciclo despacho + ex < ciclo atual: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
                         }
                     }
                 }
                 instruction_status[dyspatch_instructions_amount][2] = instruction_status[dyspatch_instructions_amount][1] + 1;
+                alert("first "+ currentInstructionToDyspatch.id);
                 instruction_status[dyspatch_instructions_amount][3] = currentInstructionToDyspatch.id;
                 
                 /*for(i=0; i<Reservation_Stations.integer_instructions_buffer.length; i++) {
@@ -866,7 +886,7 @@ function exec() {
                 // }
             dyspatch_instructions_amount++;
         }else if(currentInstructionToDyspatch.instruction_type == "load") {
-            if(reservationStationsHasDisponibleFU(Reservation_Stations.integer_instructions_buffer, __MEMORY_INSTRUCTIONS_BUFFER_SIZE__, booleanControl)) {
+            if(reservationStationsHasDisponibleFU(Reservation_Stations_Memory.load_instructions_buffer, __LOAD_INSTRUCTIONS_BUFFER_SIZE__, booleanControl)) {
                 instruction_status[dyspatch_instructions_amount][0] = cycle;
                 if(dependency_instruction.length == 0) {
                     instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
@@ -908,7 +928,7 @@ function exec() {
             // }
             dyspatch_instructions_amount++;
         }else if(currentInstructionToDyspatch.instruction_type == "store") {
-            if(reservationStationsHasDisponibleFU(Reservation_Stations.integer_instructions_buffer, __MEMORY_INSTRUCTIONS_BUFFER_SIZE__, booleanControl)) {
+            if(reservationStationsHasDisponibleFU(Reservation_Stations_Memory.store_instructions_buffer, __STORE_INSTRUCTIONS_BUFFER_SIZE__, booleanControl)) {
                 instruction_status[dyspatch_instructions_amount][0] = cycle;
                 if(dependency_instruction.length == 0) {
                     instruction_status[dyspatch_instructions_amount][1] = cycle + __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__;
