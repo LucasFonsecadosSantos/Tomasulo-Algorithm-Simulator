@@ -81,7 +81,7 @@ INSTRUCTIONS LATENCY constants
  * 
  * \var __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__
  */
-const __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ = 1;
+const __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ = 2;
 
 /**
  * Memory instructions executation latency
@@ -136,6 +136,16 @@ const Instruction_Reservated = {
     Qk: ""
 };
 
+// function Instruction_Reservatedid(id, dyspatch_cycle, disponibleBit, OPcodeLabel,Vj, Vk, Qj, Qk) {
+//     this.id = id;
+//     this.dyspatch_cycle = dyspatch_cycle;
+//     this.disponibleBit = disponibleBit;
+//     this.Vj = Vj;
+//     this.Vk = Vk;
+//     this.Qj = Qk;
+//     this.Qk = Qk;
+// }
+
 /**
  * Memory instruction reservation
  * line object to allooc;
@@ -148,6 +158,13 @@ const Instruction_Reservated_Memory = {
     address: ""
 };
 
+// function Instrutction_Reservation_Memory(id, dyspatch_cycle, disponibleBit, OPcodeLabel, address) {
+//     this.id = id;
+//     this.dyspatch_cycle = dyspatch_cycle;
+//     this.disponibleBit = disponibleBit;
+//     this.OPcodeLabel = OPcodeLabel;
+//     this.address = address;
+// }
 /**
  * Default memory reservation
  * station with line objects;
@@ -576,21 +593,36 @@ function clear_form() {
  */
 function buildReservationStations() {
     try {
-		for(i=0 ; i < Reservation_Stations.integer_instructions_buffer.length; i++) {
-			Reservation_Stations.integer_instructions_buffer[i] = Instruction_Reservated;
-		}
-		for(i=0 ; i < Reservation_Stations.float_instructions_buffer.length; i++) {
-			Reservation_Stations.float_instructions_buffer[i] = Instruction_Reservated;
-		}
-		for(i=0 ; i < Reservation_Stations.float_instructions_buffer_2.length; i++) {
-			Reservation_Stations.float_instructions_buffer_2[i] = Instruction_Reservated;
-		}
-		for(i=0 ; i < Reservation_Stations_Memory.store_instructions_buffer.length; i++) {
-			Reservation_Stations_Memory.store_instructions_buffer[i] = Instruction_Reservated_Memory;
-		}
-		for(i=0 ; i < Reservation_Stations_Memory.load_instructions_buffer.length; i++) {
-			Reservation_Stations_Memory.load_instructions_buffer[i] = Instruction_Reservated_Memory;
-		}
+        for(i=0 ; i < Reservation_Stations.integer_instructions_buffer.length; i++) {
+            Reservation_Stations.integer_instructions_buffer[i] = Object.create(Instruction_Reservated);
+        }
+        for(i=0 ; i < Reservation_Stations.float_instructions_buffer.length; i++) {
+            Reservation_Stations.float_instructions_buffer[i] = Object.create(Instruction_Reservated);
+        }
+        for(i=0 ; i < Reservation_Stations.float_instructions_buffer_2.length; i++) {
+            Reservation_Stations.float_instructions_buffer_2[i] = Object.create(Instruction_Reservated);
+        }
+        for(i=0 ; i < Reservation_Stations_Memory.store_instructions_buffer.length; i++) {
+            Reservation_Stations_Memory.store_instructions_buffer[i] = Object.create(Instruction_Reservated_Memory);
+        }
+        for(i=0 ; i < Reservation_Stations_Memory.load_instructions_buffer.length; i++) {
+            Reservation_Stations_Memory.load_instructions_buffer[i] = Object.create(Instruction_Reservated_Memory);
+        }
+        // for(i=0 ; i < Reservation_Stations.integer_instructions_buffer.length; i++) {
+        //     Reservation_Stations.integer_instructions_buffer[i] = new Instruction_Reservated(0, 0, false, "", "", "", "", "");
+        // }
+        // for(i=0 ; i < Reservation_Stations.float_instructions_buffer.length; i++) {
+        //     Reservation_Stations.float_instructions_buffer[i] = new Instruction_Reservated(0, 0, false, "", "", "", "", "");
+        // }
+        // for(i=0 ; i < Reservation_Stations.float_instructions_buffer_2.length; i++) {
+        //     Reservation_Stations.float_instructions_buffer_2[i] = new Instruction_Reservated(0, 0, false, "", "", "", "", "");
+        // }
+        // for(i=0 ; i < Reservation_Stations_Memory.store_instructions_buffer.length; i++) {
+        //     Reservation_Stations_Memory.store_instructions_buffer[i] = new Instruction_Reservated_Memory(0, 0, false, "", "");
+        // }
+        // for(i=0 ; i < Reservation_Stations_Memory.load_instructions_buffer.length; i++) {
+        //     Reservation_Stations_Memory.load_instructions_buffer[i] = new Instruction_Reservated_Memory(0, 0, false, "", "");
+        // }
 	}catch(exception) {
 		alert("ERROR: The executation failed! (" + exception + ")");
 	}
@@ -626,7 +658,7 @@ function toSolveExecDelay(currentCycle, writerCycleDependencyInstruction, curren
 }
 
 function reservationStationsHasDisponibleFU(reservationStationArray, bufferSize, control) {
-    /*try {
+    try {
         for(i=0; i < reservationStationArray.length; i++) {
             if(!reservationStationArray[i].disponibleBit) {
                 return true;
@@ -635,21 +667,54 @@ function reservationStationsHasDisponibleFU(reservationStationArray, bufferSize,
         return false;
     }catch(ex) {
         alert("THE EXECUTATION FAILED:  "+ex);
-    }*/
+    }
     return true;
 }
 
 function updateDisponibleBit(id) {
-    for(i=0 ; i < Reservation_Stations.integer_instructions_buffer.length; i++) {
-        alert(Reservation_Stations.integer_instructions_buffer[i].id);
-        alert(Reservation_Stations.integer_instructions_buffer[i].disponibleBit);
-        if(Reservation_Stations.integer_instructions_buffer[i].id == id) {
-            Reservation_Stations.integer_instructions_buffer[i].disponibleBit = false;
-        // }else {
-        //     alert("Erro de execução");
-        //     alert("1 "+ Reservation_Stations.integer_instructions_buffer[i].id);
-        //     alert("2 "+ id);
+    var type;
+    for(i=0 ; i < data.length ; i++) {
+        if(id == data[i].id) {
+            type = data[i].instruction_type;
         }
+    }
+    switch(type) {
+        case "integer":
+            for(i=0 ; i<Reservation_Stations.integer_instructions_buffer.length ; i++) {
+                if(id == Reservation_Stations.integer_instructions_buffer[i].id) {
+                    alert("MUDOU O BIT");
+                    Reservation_Stations.integer_instructions_buffer[i].disponibleBit = false;
+                }
+            }
+            break;
+        case "float_1":
+            for(i=0 ; i<Reservation_Stations.float_instructions_buffer.length ; i++) {
+                if(id == Reservation_Stations.float_instructions_buffer[i].id) {
+                    Reservation_Stations.float_instructions_buffer[i].disponibleBit = false;
+                }
+            }
+            break;
+        case "float_2":
+            for(i=0 ; i<Reservation_Stations.float_instructions_buffer_2.length ; i++) {
+                if(id == Reservation_Stations.float_instructions_buffer_2[i].id) {
+                    Reservation_Stations.float_instructions_buffer_2[i].disponibleBit = false;
+                }
+            }
+            break;
+        case "store":
+            for(i=0 ; i<Reservation_Stations_Memory.store_instructions_buffer.length ; i++) {
+                if(id == Reservation_Stations_Memory.store_instructions_buffer[i].id) {
+                    Reservation_Stations_Memory.store_instructions_buffer[i].disponibleBit = false;
+                }
+            }
+            break;
+        case "load":
+            for(i=0 ; i<Reservation_Stations_Memory.load_instructions_buffer.length ; i++) {
+                if(id == Reservation_Stations_Memory.load_instructions_buffer[i].id) {
+                    Reservation_Stations_Memory.load_instructions_buffer[i].disponibleBit = false;
+                }
+            }
+            break;
     }
 }
 /**
@@ -675,29 +740,27 @@ function exec() {
     }
 
     do {
-        
         cycle++;
         currentInstructionToDyspatch = data[dyspatch_instructions_amount];
         instruction_status[dyspatch_instructions_amount] = new Array(4);
         lineNumber = 0;
-		/*
-        for(i=0 ; i < instruction_status.length; i++) {
-            if(cycle == instruction_status[i][1]) {
-                updateDisponibleBit(instruction_status[i][3]);
-            }
-        }*/
         
         //Build the reservation stations if it is on the first cycle;
         if(cycle == 1) {
             buildReservationStations();
         }
 
+        for(i=0 ; i < instruction_status.length; i++) {
+            if(cycle == instruction_status[i][2]) {
+                updateDisponibleBit(instruction_status[i][3]);
+            }
+        }
+    
         //Dyspatch
         var booleanControl = true;
         var dependency_instruction = new Array();
         
         for(i = cycle-2; i >= 0; i--) {
-            alert(data[cycle-1].identifier);
             if(data[cycle-1].identifier == "BNEZ") {
                 if(data[i].RD == currentInstructionToDyspatch.RD) {
                     dependency_instruction.push(data[i]);
@@ -749,42 +812,78 @@ function exec() {
                                 instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(cycle, instruction_status[run][2], __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__, dependency_instruction[lineNumber].dyspatch_cycle, __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__);
                             }
                         }
-                        /*
-                        for(i=0 ; i < __INTEGER_INSTRUCTIONS_BUFFER_SIZE__; i++) {
-                            alert("rodo "+i);
-                            if(!Reservation_Stations.integer_instructions_buffer[i].disponibleBit) {
-                                Reservation_Stations.integer_instructions_buffer[i].dyspatch_cycle = currentInstructionToDyspatch.dyspatch_cycle; //Functional unit receives a current dyspatch cycle;
-                                Reservation_Stations.integer_instructions_buffer[i].disponibleBit = true; //Busy
-                                Reservation_Stations.integer_instructions_buffer[i].OPcodeLabel = currentInstructionToDyspatch.identifier; //Instruction name
-                                Reservation_Stations.integer_instructions_buffer[i].Vj = "" ;
-                                Reservation_Stations.integer_instructions_buffer[i].id = currentInstructionToDyspatch.id;
-                                break;
-                            }
-                        }*/
-                    }else if(dependency_instruction[lineNumber].instruction_type == "load" || dependency_instruction[lineNumber].instruction_type == "store") {
-                        for(run=0 ; run<instruction_status.length; run++) {
-                            if(dependency_instruction[lineNumber].id == instruction_status[run][3]) {
-                                instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(cycle, instruction_status[run][2],__INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ , dependency_instruction[lineNumber].dyspatch_cycle, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
-                            }
-                        }
-                        for(run=0 ; run<instruction_status.length; run++) {
-                            if(dependency_instruction[lineNumber].id == instruction_status[run][3]) {
-                                instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(cycle, instruction_status[run][2],  __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__, dependency_instruction[lineNumber].dyspatch_cycle,__MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
-                            }
-                        }
+                    // }else if(dependency_instruction[lineNumber].instruction_type == "load" || dependency_instruction[lineNumber].instruction_type == "store") {
+                    //     for(run=0 ; run<instruction_status.length; run++) {
+                    //         if(dependency_instruction[lineNumber].id == instruction_status[run][3]) {
+                    //             instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(cycle, instruction_status[run][2],__INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__ , dependency_instruction[lineNumber].dyspatch_cycle, __MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
+                    //         }
+                    //     }
+                    //     for(run=0 ; run<instruction_status.length; run++) {
+                    //         if(dependency_instruction[lineNumber].id == instruction_status[run][3]) {
+                    //             instruction_status[dyspatch_instructions_amount][1] = toSolveExecDelay(cycle, instruction_status[run][2],  __INTEGER_INSTRUCTIONS_CYCLES_AMOUNT__, dependency_instruction[lineNumber].dyspatch_cycle,__MEMORY_INSTRUCTIONS_CYCLES_AMOUNT__);
+                    //         }
+                    //     }
+                    // }
                     }
                 }
                 instruction_status[dyspatch_instructions_amount][2] = instruction_status[dyspatch_instructions_amount][1] + 1;
                 instruction_status[dyspatch_instructions_amount][3] = currentInstructionToDyspatch.id;        
-                /*for(i=0; i<Reservation_Stations.integer_instructions_buffer.length; i++) {
-                    alert(Reservation_Stations.integer_instructions_buffer[i].id);
-                }*/
-                // alert("issue: "+instruction_status[dyspatch_instructions_amount][0] + "\nEX: "+instruction_status[dyspatch_instructions_amount][1] + "\nWB: " + instruction_status[dyspatch_instructions_amount][2]);
+                dyspatch_instructions_amount++;
+                for(t=0 ; t < __INTEGER_INSTRUCTIONS_BUFFER_SIZE__ ; t++) {
+                    if(Reservation_Stations.integer_instructions_buffer[t].disponibleBit == false) {
+                        Reservation_Stations.integer_instructions_buffer[t].id = currentInstructionToDyspatch.id;
+                        Reservation_Stations.integer_instructions_buffer[t].dyspatch_cycle = currentInstructionToDyspatch.dyspatch_cycle;
+                        Reservation_Stations.integer_instructions_buffer[t].OPcodeLabel = currentInstructionToDyspatch.identifier;
+                        Reservation_Stations.integer_instructions_buffer[t].disponibleBit = true;
+                        if(dependency_instruction.length > 0) {
+                            if(dependency_instruction[lineNumber].RD == currentInstructionToDyspatch.RS) {
+                                Reservation_Stations.integer_instructions_buffer[t].Vj = "";
+                                Reservation_Stations.integer_instructions_buffer[t].Vk = currentInstructionToDyspatch.RT;
+                                for(iteration = 0 ; iteration < Reservation_Stations.integer_instructions_buffer.length ; iteration++) {
+                                    if(dependency_instruction[lineNumber].id == Reservation_Stations.integer_instructions_buffer[iteration].id) {
+                                        Reservation_Stations.integer_instructions_buffer[t].Qj = "Integer ["+iteration+"]";
+                                        Reservation_Stations.integer_instructions_buffer[t].Qk = "";
+                                        break;
+                                    }
+                                }
+                            }else if(dependency_instruction[lineNumber].RD == currentInstructionToDyspatch.RT) {
+                                Reservation_Stations.integer_instructions_buffer[t].Vj = currentInstructionToDyspatch.RS;
+                                Reservation_Stations.integer_instructions_buffer[t].Vk = "";
+                                for(iteration = 0 ; iteration < Reservation_Stations.integer_instructions_buffer.length ; iteration++) {
+                                    if(dependency_instruction[lineNumber].id == Reservation_Stations.integer_instructions_buffer[iteration].id) {
+                                        Reservation_Stations.integer_instructions_buffer[t].Qj = "";
+                                        Reservation_Stations.integer_instructions_buffer[t].Qk = "Integer ["+iteration+"]";
+                                        break;
+                                    }
+                                }
+                            }else if((dependency_instruction[lineNumber].RD == currentInstructionToDyspatch.RT) && (dependency_instruction[lineNumber].RD == currentInstructionToDyspatch.RS)){
+                                Reservation_Stations.integer_instructions_buffer[t].Vj = "";
+                                Reservation_Stations.integer_instructions_buffer[t].Vk = "";
+                                for(iteration = 0 ; iteration < Reservation_Stations.integer_instructions_buffer.length ; iteration++) {
+                                    if(dependency_instruction[lineNumber].id == Reservation_Stations.integer_instructions_buffer[iteration].id) {
+                                        Reservation_Stations.integer_instructions_buffer[t].Qj = "Integer ["+iteration+"]";
+                                        Reservation_Stations.integer_instructions_buffer[t].Qk = "Integer ["+iteration+"]";
+                                        break;
+                                    }
+                                }
+                            }
+                        }else {
+                            Reservation_Stations.integer_instructions_buffer[t].Vj = currentInstructionToDyspatch.RS;
+                            Reservation_Stations.integer_instructions_buffer[t].Vk = currentInstructionToDyspatch.RT;
+                            Reservation_Stations.integer_instructions_buffer[t].Qj = Reservation_Stations.integer_instructions_buffer[t].Qk = "";
+                            break;
+                        }
+                    }
+                }
+
+                for(i=0 ; i < Reservation_Stations.integer_instructions_buffer.length ; i++) {
+                    alert("RESERVATION BUSY: "+ i + " \nDISPONIVEL: " + Reservation_Stations.integer_instructions_buffer[i].disponibleBit + "\nVJ: " + Reservation_Stations.integer_instructions_buffer[i].Vj + "\nVK: " + Reservation_Stations.integer_instructions_buffer[i].Vk + "\nQj: " + Reservation_Stations.integer_instructions_buffer[i].Qj + "\nQk: "+Reservation_Stations.integer_instructions_buffer[i].Qk);
+                }
+                alert(Reservation_Stations.integer_instructions_buffer[2] === Reservation_Stations.integer_instructions_buffer[1]);
             }else {
-                alert("caiu");
-                continue;
+                    alert("caiu");
+                    continue;
             }
-            dyspatch_instructions_amount++;
         }else if(currentInstructionToDyspatch.instruction_type == "float_1") {            
             if(reservationStationsHasDisponibleFU(Reservation_Stations.float_instructions_buffer, __FLOAT_INSTRUCTIONS_BUFFER_SIZE__, booleanControl)) {
                 instruction_status[dyspatch_instructions_amount][0] = cycle;
