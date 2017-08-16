@@ -66,7 +66,7 @@ const __FLOAT_INSTRUCTIONS_BUFFER_SIZE__    = 3;
  * 
  * \var __INTEGER_INSTRUCTIONS_BUFFER_SIZE__
  */
-const __INTEGER_INSTRUCTIONS_BUFFER_SIZE__  = 1;
+const __INTEGER_INSTRUCTIONS_BUFFER_SIZE__  = 3;
 
 
 
@@ -635,6 +635,7 @@ function reservationStationsHasDisponibleFU(reservationStationArray, bufferSize,
     try {
         for(i=0; i < reservationStationArray.length; i++) {
             if(!reservationStationArray[i].disponibleBit) {
+                alert("HAVE");
                 return true;
             }
         }
@@ -659,7 +660,7 @@ function updateDisponibleBit(id) {
                     alert("MUDOU O BIT "+Reservation_Stations.integer_instructions_buffer[i].dyspatch_cycle);
                     Reservation_Stations.integer_instructions_buffer[i].disponibleBit = false;
                     alert("agr vamo ver como ficou tudo");
-                    alert(Reservation_Stations.integer_instructions_buffer.length);
+                    alert("tam " +Reservation_Stations.integer_instructions_buffer.length);
                     for(k=0 ; k < Reservation_Stations.integer_instructions_buffer.length ; k++) {
                         alert("DYSPATCH CYCLE "+Reservation_Stations.integer_instructions_buffer[i].dyspatch_cycle + "\ndiponible bit "+Reservation_Stations.integer_instructions_buffer[i].disponibleBit)
                     }
@@ -724,7 +725,7 @@ function exec() {
         currentInstructionToDyspatch = data[dyspatch_instructions_amount];
         instruction_status[dyspatch_instructions_amount] = new Array(4);
         lineNumber = 0;
-        
+
         //Build the reservation stations if it is on the first cycle;
         if(cycle == 1) {
             buildReservationStations();
@@ -740,8 +741,8 @@ function exec() {
         var booleanControl = true;
         var dependency_instruction = new Array();
         
-        for(i = cycle-2; i >= 0; i--) {
-            if(data[cycle-1].identifier == "BNEZ") {
+        for(i = dyspatch_instructions_amount-2; i >= 0; i--) {
+            if(data[dyspatch_instructions_amount-1].identifier == "BNEZ") {
                 if(data[i].RD == currentInstructionToDyspatch.RD) {
                     dependency_instruction.push(data[i]);
                 }
