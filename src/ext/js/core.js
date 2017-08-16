@@ -66,7 +66,7 @@ const __FLOAT_INSTRUCTIONS_BUFFER_SIZE__    = 3;
  * 
  * \var __INTEGER_INSTRUCTIONS_BUFFER_SIZE__
  */
-const __INTEGER_INSTRUCTIONS_BUFFER_SIZE__  = 3;
+const __INTEGER_INSTRUCTIONS_BUFFER_SIZE__  = 1;
 
 
 
@@ -158,13 +158,6 @@ const Instruction_Reservated_Memory = {
     address: ""
 };
 
-// function Instrutction_Reservation_Memory(id, dyspatch_cycle, disponibleBit, OPcodeLabel, address) {
-//     this.id = id;
-//     this.dyspatch_cycle = dyspatch_cycle;
-//     this.disponibleBit = disponibleBit;
-//     this.OPcodeLabel = OPcodeLabel;
-//     this.address = address;
-// }
 /**
  * Default memory reservation
  * station with line objects;
@@ -175,6 +168,7 @@ const Reservation_Stations = {
     float_instructions_buffer_2: new Array(__FLOAT_INSTRUCTIONS_BUFFER_2_SIZE__)
 };
 
+
 /**
  * Memory reservation station
  * table with line objects;
@@ -184,6 +178,39 @@ const Reservation_Stations_Memory = {
     load_instructions_buffer:  new Array(__LOAD_INSTRUCTIONS_BUFFER_SIZE__)
 };
 
+/**
+ * Dispatched instructions counter;
+ * Used for controller settings in the tomasulo
+ * exec function.
+ * 
+ * \var dyspatch_index
+ */
+var dyspatch_index = 1;
+
+/**
+ * Float registers counter array object,
+ * used for update screen informations.
+ * 8 positions.
+ * 
+ * \var counter_float_registers
+ */
+var counter_float_registers = [0,0,0,0,0,0,0,0];
+
+/**
+ * INteger registers counter array object,
+ * used for update screen informations.
+ * 32 positions.
+ * 
+ * \var counter_integer_registers
+ */
+var counter_integer_registers = [
+    0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,
+    0,0
+];
+
+document.getElementById("instructions_list_viwer").value = "";
 /**************************************************************************************** */
 
 /**
@@ -503,39 +530,6 @@ function updateInformations(object) {
     }
 }
 
-/**
- * Dispatched instructions counter;
- * Used for controller settings in the tomasulo
- * exec function.
- * 
- * \var dyspatch_index
- */
-var dyspatch_index = 1;
-
-/**
- * Float registers counter array object,
- * used for update screen informations.
- * 8 positions.
- * 
- * \var counter_float_registers
- */
-var counter_float_registers = [0,0,0,0,0,0,0,0];
-
-/**
- * INteger registers counter array object,
- * used for update screen informations.
- * 32 positions.
- * 
- * \var counter_integer_registers
- */
-var counter_integer_registers = [
-    0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,
-    0,0
-];
-
-document.getElementById("instructions_list_viwer").value = "";
 
 /**
  * This functions adds to global data array
@@ -563,17 +557,12 @@ const confirmInst = function () {
         return;
     }
     updateInformations(Instruction);
-    // alert('Instruction:', JSON.stringify(Instruction));
     data.push(Instruction);
     if(Instruction.instruction_type == "load" || Instruction.instruction_type == "store") {
         document.getElementById("instructions_list_viwer").value += Instruction.dyspatch_cycle + ". "+Instruction.identifier + " " + Instruction.RD + ", " + Instruction.RS + "("+Instruction.RT+")" + "\n";
     }else {
         document.getElementById("instructions_list_viwer").value += Instruction.dyspatch_cycle +  ". "+Instruction.identifier + " " + Instruction.RD + ", " + Instruction.RS + ", " + Instruction.RT + "\n";
     }
-    // data.forEach(function(element) {
-    //     alert(JSON.stringify(element));
-    //     // console.log(JSON.stringify(element));
-    // }, this);
 };
 
 /**
@@ -667,8 +656,13 @@ function updateDisponibleBit(id) {
         case "integer":
             for(i=0 ; i<Reservation_Stations.integer_instructions_buffer.length ; i++) {
                 if(id == Reservation_Stations.integer_instructions_buffer[i].id) {
-                    alert("MUDOU O BIT");
+                    alert("MUDOU O BIT "+Reservation_Stations.integer_instructions_buffer[i].dyspatch_cycle);
                     Reservation_Stations.integer_instructions_buffer[i].disponibleBit = false;
+                    alert("agr vamo ver como ficou tudo");
+                    alert(Reservation_Stations.integer_instructions_buffer.length);
+                    for(k=0 ; k < Reservation_Stations.integer_instructions_buffer.length ; k++) {
+                        alert("DYSPATCH CYCLE "+Reservation_Stations.integer_instructions_buffer[i].dyspatch_cycle + "\ndiponible bit "+Reservation_Stations.integer_instructions_buffer[i].disponibleBit)
+                    }
                 }
             }
             break;
@@ -726,6 +720,7 @@ function exec() {
 
     do {
         cycle++;
+        alert("cycle "+cycle +", dyspatcths "+dyspatch_instructions_amount);
         currentInstructionToDyspatch = data[dyspatch_instructions_amount];
         instruction_status[dyspatch_instructions_amount] = new Array(4);
         lineNumber = 0;
@@ -813,9 +808,9 @@ function exec() {
                 }
                 instruction_status[dyspatch_instructions_amount][2] = instruction_status[dyspatch_instructions_amount][1] + 1;
                 instruction_status[dyspatch_instructions_amount][3] = currentInstructionToDyspatch.id;        
-                dyspatch_instructions_amount++;
                 for(t=0 ; t < __INTEGER_INSTRUCTIONS_BUFFER_SIZE__ ; t++) {
                     if(Reservation_Stations.integer_instructions_buffer[t].disponibleBit == false) {
+                        dyspatch_instructions_amount++;
                         Reservation_Stations.integer_instructions_buffer[t].id = currentInstructionToDyspatch.id;
                         Reservation_Stations.integer_instructions_buffer[t].dyspatch_cycle = currentInstructionToDyspatch.dyspatch_cycle;
                         Reservation_Stations.integer_instructions_buffer[t].OPcodeLabel = currentInstructionToDyspatch.identifier;
@@ -860,7 +855,6 @@ function exec() {
                         }
                     }
                 }
-
                 for(i=0 ; i < Reservation_Stations.integer_instructions_buffer.length ; i++) {
                     alert("RESERVATION BUSY: "+ i + " \nDISPONIVEL: " + Reservation_Stations.integer_instructions_buffer[i].disponibleBit + "\nVJ: " + Reservation_Stations.integer_instructions_buffer[i].Vj + "\nVK: " + Reservation_Stations.integer_instructions_buffer[i].Vk + "\nQj: " + Reservation_Stations.integer_instructions_buffer[i].Qj + "\nQk: "+Reservation_Stations.integer_instructions_buffer[i].Qk);
                 }
@@ -1116,7 +1110,7 @@ function renderizeResults(cycle) {
     for(i = 0 ; i < Reservation_Stations.integer_instructions_buffer.length ; i++) {
         reservation_table += "<tr>";
             reservation_table += "<td><p>";
-                reservation_table += "Integer ["+i+"]";
+                reservation_table += "Integer ["+eval(i+1)+"]";
             reservation_table += "</p></td>";
             reservation_table += "<td><p>";
                 if(Reservation_Stations.integer_instructions_buffer[i].disponibleBit) {
@@ -1144,10 +1138,11 @@ function renderizeResults(cycle) {
         reservation_table += "</tr>";
     }
 
+    reservation_table += "<tr><td colspan='7'><hr/></td></tr>";
     for(i = 0 ; i < Reservation_Stations.float_instructions_buffer.length ; i++) {
         reservation_table += "<tr>";
             reservation_table += "<td><p>";
-                reservation_table += "Float_1 ["+i+"]";
+                reservation_table += "Float_1 ["+eval(i+1)+"]";
             reservation_table += "</p></td>";
             reservation_table += "<td><p>";
                 if(Reservation_Stations.float_instructions_buffer[i].disponibleBit) {
@@ -1174,11 +1169,11 @@ function renderizeResults(cycle) {
             reservation_table += "</p></td>";
         reservation_table += "</tr>";
     }
-
+    reservation_table += "<tr><td colspan='7'><hr/></td></tr>";
     for(i = 0 ; i < Reservation_Stations.float_instructions_buffer_2.length ; i++) {
         reservation_table += "<tr>";
             reservation_table += "<td><p>";
-                reservation_table += "Float_2 ["+i+"]";
+                reservation_table += "Float_2 ["+eval(i+1)+"]";
             reservation_table += "</p></td>";
             reservation_table += "<td><p>";
                 if(Reservation_Stations.float_instructions_buffer_2[i].disponibleBit) {
@@ -1209,7 +1204,7 @@ function renderizeResults(cycle) {
     for(i = 0 ; i < Reservation_Stations_Memory.load_instructions_buffer.length ; i++) {
         memory_reservation_table += "<tr>";
             memory_reservation_table += "<td><p>";
-                memory_reservation_table += "Load ["+i+"]";
+                memory_reservation_table += "Load ["+eval(i+1)+"]";
             memory_reservation_table += "</p></td>";
             memory_reservation_table += "<td><p>";
                 if(Reservation_Stations_Memory.load_instructions_buffer[i].disponibleBit) {
@@ -1228,11 +1223,11 @@ function renderizeResults(cycle) {
             memory_reservation_table += "</p></td>";
         memory_reservation_table += "</tr>";
     }
-
+    memory_reservation_table += "<tr><td colspan='3'><hr/></td></tr>";
     for(i = 0 ; i < Reservation_Stations_Memory.store_instructions_buffer.length ; i++) {
         memory_reservation_table += "<tr>";
             memory_reservation_table += "<td><p>";
-                memory_reservation_table += "Store ["+i+"]";
+                memory_reservation_table += "Store ["+eval(i+1)+"]";
             memory_reservation_table += "</p></td>";
             memory_reservation_table += "<td><p>";
                 if(Reservation_Stations_Memory.store_instructions_buffer[i].disponibleBit) {
@@ -1257,7 +1252,7 @@ function renderizeResults(cycle) {
     "<!DOCTYPE html>"+
     "<html>"+
         "<head>"+
-            "<title>teste</title>"+
+            "<title>Tomasulo Proccess Result</title>"+
             "<style>"+
                 "* {"+
                     "margin: 0px auto;"+
