@@ -608,21 +608,6 @@ function buildReservationStations() {
         for(i=0 ; i < Reservation_Stations_Memory.load_instructions_buffer.length; i++) {
             Reservation_Stations_Memory.load_instructions_buffer[i] = Object.create(Instruction_Reservated_Memory);
         }
-        // for(i=0 ; i < Reservation_Stations.integer_instructions_buffer.length; i++) {
-        //     Reservation_Stations.integer_instructions_buffer[i] = new Instruction_Reservated(0, 0, false, "", "", "", "", "");
-        // }
-        // for(i=0 ; i < Reservation_Stations.float_instructions_buffer.length; i++) {
-        //     Reservation_Stations.float_instructions_buffer[i] = new Instruction_Reservated(0, 0, false, "", "", "", "", "");
-        // }
-        // for(i=0 ; i < Reservation_Stations.float_instructions_buffer_2.length; i++) {
-        //     Reservation_Stations.float_instructions_buffer_2[i] = new Instruction_Reservated(0, 0, false, "", "", "", "", "");
-        // }
-        // for(i=0 ; i < Reservation_Stations_Memory.store_instructions_buffer.length; i++) {
-        //     Reservation_Stations_Memory.store_instructions_buffer[i] = new Instruction_Reservated_Memory(0, 0, false, "", "");
-        // }
-        // for(i=0 ; i < Reservation_Stations_Memory.load_instructions_buffer.length; i++) {
-        //     Reservation_Stations_Memory.load_instructions_buffer[i] = new Instruction_Reservated_Memory(0, 0, false, "", "");
-        // }
 	}catch(exception) {
 		alert("ERROR: The executation failed! (" + exception + ")");
 	}
@@ -1099,7 +1084,7 @@ function exec() {
             dyspatch_instructions_amount++;
         }   
     }while(dyspatch_instructions_amount < data.length);
-    renderizeResults();
+    renderizeResults(cycle);
 }
 
 /**
@@ -1108,8 +1093,11 @@ function exec() {
  * It generates a new html page with tables and all proccessing
  * content.
  */
-function renderizeResults() {
+function renderizeResults(cycle) {
     var exec_table = "";
+    var reservation_table = "";
+    var memory_reservation_table = "";
+
     for(i = 0; i < instruction_status.length; i++) {
         exec_table += "<tr>";
         exec_table += "<td style='text-align:left !important;'><p> ";
@@ -1124,6 +1112,146 @@ function renderizeResults() {
         }
         exec_table += "</tr>";
     }
+
+    for(i = 0 ; i < Reservation_Stations.integer_instructions_buffer.length ; i++) {
+        reservation_table += "<tr>";
+            reservation_table += "<td><p>";
+                reservation_table += "Integer ["+i+"]";
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p>";
+                if(Reservation_Stations.integer_instructions_buffer[i].disponibleBit) {
+                    reservation_table += "<span style='color:#F00'>YES </spoan>";
+                }else if(!Reservation_Stations.integer_instructions_buffer[i].disponibleBit){
+                    reservation_table += "<span style='color: #00FF00;'>NO </span>";
+                }
+                
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p>";
+                reservation_table += Reservation_Stations.integer_instructions_buffer[i].OPcodeLabel;
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p>";
+                reservation_table += Reservation_Stations.integer_instructions_buffer[i].Vj;
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p>";
+                reservation_table += Reservation_Stations.integer_instructions_buffer[i].Vk;
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p style='color: #F00;'>";
+                reservation_table += Reservation_Stations.integer_instructions_buffer[i].Qj;
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p style='color: #F00;'>";
+                reservation_table += Reservation_Stations.integer_instructions_buffer[i].Qk;
+            reservation_table += "</p></td>";
+        reservation_table += "</tr>";
+    }
+
+    for(i = 0 ; i < Reservation_Stations.float_instructions_buffer.length ; i++) {
+        reservation_table += "<tr>";
+            reservation_table += "<td><p>";
+                reservation_table += "Float_1 ["+i+"]";
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p>";
+                if(Reservation_Stations.float_instructions_buffer[i].disponibleBit) {
+                    reservation_table += "<span style='color:#F00'>YES </spoan>";
+                }else if(!Reservation_Stations.float_instructions_buffer[i].disponibleBit){
+                    reservation_table += "<span style='color: #00FF00;'>NO </span>";
+                }
+                
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p>";
+                reservation_table += Reservation_Stations.float_instructions_buffer[i].OPcodeLabel;
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p>";
+                reservation_table += Reservation_Stations.float_instructions_buffer[i].Vj;
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p>";
+                reservation_table += Reservation_Stations.float_instructions_buffer[i].Vk;
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p style='color: #F00;'>";
+                reservation_table += Reservation_Stations.float_instructions_buffer[i].Qj;
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p style='color: #F00;'>";
+                reservation_table += Reservation_Stations.float_instructions_buffer[i].Qk;
+            reservation_table += "</p></td>";
+        reservation_table += "</tr>";
+    }
+
+    for(i = 0 ; i < Reservation_Stations.float_instructions_buffer_2.length ; i++) {
+        reservation_table += "<tr>";
+            reservation_table += "<td><p>";
+                reservation_table += "Float_2 ["+i+"]";
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p>";
+                if(Reservation_Stations.float_instructions_buffer_2[i].disponibleBit) {
+                    reservation_table += "<span style='color:#F00'>YES </spoan>";
+                }else if(!Reservation_Stations.float_instructions_buffer_2[i].disponibleBit){
+                    reservation_table += "<span style='color: #00FF00;'>NO </span>";
+                }
+                
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p>";
+                reservation_table += Reservation_Stations.float_instructions_buffer_2[i].OPcodeLabel;
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p>";
+                reservation_table += Reservation_Stations.float_instructions_buffer_2[i].Vj;
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p>";
+                reservation_table += Reservation_Stations.float_instructions_buffer_2[i].Vk;
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p style='color: #F00;'>";
+                reservation_table += Reservation_Stations.float_instructions_buffer_2[i].Qj;
+            reservation_table += "</p></td>";
+            reservation_table += "<td><p style='color: #F00;'>";
+                reservation_table += Reservation_Stations.float_instructions_buffer_2[i].Qk;
+            reservation_table += "</p></td>";
+        reservation_table += "</tr>";
+    }
+
+    for(i = 0 ; i < Reservation_Stations_Memory.load_instructions_buffer.length ; i++) {
+        memory_reservation_table += "<tr>";
+            memory_reservation_table += "<td><p>";
+                memory_reservation_table += "Load ["+i+"]";
+            memory_reservation_table += "</p></td>";
+            memory_reservation_table += "<td><p>";
+                if(Reservation_Stations_Memory.load_instructions_buffer[i].disponibleBit) {
+                    memory_reservation_table += "<span style='color:#F00'>YES </spoan>";
+                }else if(!Reservation_Stations_Memory.load_instructions_buffer[i].disponibleBit){
+                    memory_reservation_table += "<span style='color: #00FF00;'>NO </span>";
+                }
+                
+            memory_reservation_table += "</p></td>";
+            memory_reservation_table += "<td><p>";
+                if(Reservation_Stations_Memory.load_instructions_buffer[i].RS == undefined || Reservation_Stations_Memory.load_instructions_buffer[i].RT == undefined) {
+                    Reservation_Stations_Memory.load_instructions_buffer[i].RS = "";
+                    Reservation_Stations_Memory.load_instructions_buffer[i].RT = "";
+                }
+                memory_reservation_table += Reservation_Stations_Memory.load_instructions_buffer[i].RS +"+"+ Reservation_Stations_Memory.load_instructions_buffer[i].RT;
+            memory_reservation_table += "</p></td>";
+        memory_reservation_table += "</tr>";
+    }
+
+    for(i = 0 ; i < Reservation_Stations_Memory.store_instructions_buffer.length ; i++) {
+        memory_reservation_table += "<tr>";
+            memory_reservation_table += "<td><p>";
+                memory_reservation_table += "Store ["+i+"]";
+            memory_reservation_table += "</p></td>";
+            memory_reservation_table += "<td><p>";
+                if(Reservation_Stations_Memory.store_instructions_buffer[i].disponibleBit) {
+                    memory_reservation_table += "<span style='color:#F00'>YES </spoan>";
+                }else if(!Reservation_Stations_Memory.store_instructions_buffer[i].disponibleBit){
+                    memory_reservation_table += "<span style='color: #00FF00;'>NO </span>";
+                }
+                
+            memory_reservation_table += "</p></td>";
+            memory_reservation_table += "<td><p>";
+                if(Reservation_Stations_Memory.store_instructions_buffer[i].RS == undefined || Reservation_Stations_Memory.store_instructions_buffer[i].RT == undefined) {
+                    Reservation_Stations_Memory.store_instructions_buffer[i].RS = "";
+                    Reservation_Stations_Memory.store_instructions_buffer[i].RT = "";
+                }
+                memory_reservation_table += Reservation_Stations_Memory.store_instructions_buffer[i].RS +"+"+ Reservation_Stations_Memory.store_instructions_buffer[i].RT;
+            memory_reservation_table += "</p></td>";
+        memory_reservation_table += "</tr>";
+    }
+
     var myWindow = window.open("", "_blank", "toolbar=yes,scrollbars=yes,resizable=no,top=500,left=500,width=600px,height=400px");
     myWindow.document.write(+
     "<!DOCTYPE html>"+
@@ -1154,6 +1282,7 @@ function renderizeResults() {
                     "-moz-border-radius: 10px;"+
                     "-webkit-border-radius: 10px;"+
                     "text-align: center !important;"+
+                    "margin-bottom: 100px"+
                 "}"+
                 "tr {"+
                     "border: solid 1px #FFF !important;"+
@@ -1202,6 +1331,40 @@ function renderizeResults() {
                                     "<td>WRITE:</td>"+
                                 "</tr>"+
                                 exec_table
+                            +"</tbody>"+
+                        "</table>"+
+                        "<table>"+
+                            "<thead>"+
+                                "<tr>"+
+                                    "<td colspan='7'><h1> Reservation Stations - CYCLE "+cycle+"</h1></td>"+
+                                "</tr>"+
+                            "</thead>"+
+                            "<tbody>"+
+                                "<tr>"+
+                                    "<td>FUNCTIONAL UNIT</td>"+
+                                    "<td>BUSY</td>"+
+                                    "<td>OPCode Label</td>"+
+                                    "<td>Vj</td>"+
+                                    "<td>Vk</td>"+
+                                    "<td>Qj</td>"+
+                                    "<td>Qk</td>"+
+                                "</tr>"+
+                                reservation_table
+                            +"</tbody>"+
+                        "</table>"+
+                        "<table>"+
+                            "<thead>"+
+                                "<tr>"+
+                                    "<td colspan='3'><h1> Memory Reservation Stations - CYCLE "+cycle+"</h1></td>"+
+                                "</tr>"+
+                            "</thead>"+
+                            "<tbody>"+
+                                "<tr>"+
+                                    "<td>FUNCTIONAL UNIT</td>"+
+                                    "<td>BUSY</td>"+
+                                    "<td>Address</td>"+
+                                "</tr>"+
+                                memory_reservation_table
                             +"</tbody>"+
                         "</table>"+
                     "</center>"+
